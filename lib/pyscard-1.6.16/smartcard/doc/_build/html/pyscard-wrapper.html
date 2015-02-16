@@ -1,0 +1,1469 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>PCSC wrapper samples &mdash; pyscard 1.6.16 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.6.16',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="pyscard 1.6.16 documentation" href="index.html" />
+    <link rel="next" title="License" href="license.html" />
+    <link rel="prev" title="pyscard smartcard framework samples" href="pyscard-framework.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="license.html" title="License"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="pyscard-framework.html" title="pyscard smartcard framework samples"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">pyscard 1.6.16 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="pcsc-wrapper-samples">
+<span id="wrapper-samples"></span><h1>PCSC wrapper samples<a class="headerlink" href="#pcsc-wrapper-samples" title="Permalink to this headline">¶</a></h1>
+<p>Using the smartcard framework is the preferred way to write python smart
+card application. You can however use the smartcard.scard library to
+write your python smart card application if you want to write your own
+python framework, or if you want to access some features of the SCardXXX
+C API not available in the smartcard framework.</p>
+<p>The smartcard.scard module is a native extension module wrapping Windows
+smart card base components (also known as PCSC) on Windows, and
+pcsc-lite on linux and Mac OS X, whereas the smartcard framework is a
+pure python framework hiding scard complexity and PCSC.</p>
+<div class="section" id="send-a-control-code-to-a-card-or-reader">
+<h2>send a Control Code to a card or reader<a class="headerlink" href="#send-a-control-code-to-a-card-or-reader" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#! /usr/bin/env python</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Sample for python PCSC wrapper module: send a Control Code to a card or</span>
+<span class="sd">reader</span>
+
+<span class="sd">__author__ = &quot;Ludovic Rousseau&quot;</span>
+
+<span class="sd">Copyright 2007-2010 Ludovic Rousseau</span>
+<span class="sd">Author: Ludovic Rousseau, mailto:ludovic.rousseau@free.fr</span>
+
+<span class="sd">This file is part of pyscard.</span>
+
+<span class="sd">pyscard is free software; you can redistribute it and/or modify</span>
+<span class="sd">it under the terms of the GNU Lesser General Public License as published by</span>
+<span class="sd">the Free Software Foundation; either version 2.1 of the License, or</span>
+<span class="sd">(at your option) any later version.</span>
+
+<span class="sd">pyscard is distributed in the hope that it will be useful,</span>
+<span class="sd">but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="sd">MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="sd">GNU Lesser General Public License for more details.</span>
+
+<span class="sd">You should have received a copy of the GNU Lesser General Public License</span>
+<span class="sd">along with pyscard; if not, write to the Free Software</span>
+<span class="sd">Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">smartcard.scard</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">from</span> <span class="nn">smartcard.util</span> <span class="kn">import</span> <span class="n">toBytes</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">hresult</span><span class="p">,</span> <span class="n">hcontext</span> <span class="o">=</span> <span class="n">SCardEstablishContext</span><span class="p">(</span><span class="n">SCARD_SCOPE_USER</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+            <span class="s">&#39;Failed to establish context: &#39;</span> <span class="o">+</span> <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+    <span class="k">print</span> <span class="s">&#39;Context established!&#39;</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">hresult</span><span class="p">,</span> <span class="n">readers</span> <span class="o">=</span> <span class="n">SCardListReaders</span><span class="p">(</span><span class="n">hcontext</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                <span class="s">&#39;Failed to list readers: &#39;</span> <span class="o">+</span> <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+        <span class="k">print</span> <span class="s">&#39;PCSC Readers:&#39;</span><span class="p">,</span> <span class="n">readers</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">readers</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">error</span><span class="p">(</span><span class="s">&#39;No smart card readers&#39;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">zreader</span> <span class="ow">in</span> <span class="n">readers</span><span class="p">:</span>
+
+            <span class="k">print</span> <span class="s">&#39;Trying to Control reader:&#39;</span><span class="p">,</span> <span class="n">zreader</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">hresult</span><span class="p">,</span> <span class="n">hcard</span><span class="p">,</span> <span class="n">dwActiveProtocol</span> <span class="o">=</span> <span class="n">SCardConnect</span><span class="p">(</span>
+                    <span class="n">hcontext</span><span class="p">,</span> <span class="n">zreader</span><span class="p">,</span> <span class="n">SCARD_SHARE_DIRECT</span><span class="p">,</span> <span class="n">SCARD_PROTOCOL_T0</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                        <span class="s">&#39;Unable to connect: &#39;</span> <span class="o">+</span> <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+                <span class="k">print</span> <span class="s">&#39;Connected with active protocol&#39;</span><span class="p">,</span> <span class="n">dwActiveProtocol</span>
+
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="s">&#39;winscard&#39;</span> <span class="o">==</span> <span class="n">resourceManager</span><span class="p">:</span>
+                        <span class="c"># IOCTL_SMARTCARD_GET_ATTRIBUTE = SCARD_CTL_CODE(2)</span>
+                        <span class="n">hresult</span><span class="p">,</span> <span class="n">response</span> <span class="o">=</span> <span class="n">SCardControl</span><span class="p">(</span>
+                            <span class="n">hcard</span><span class="p">,</span>
+                            <span class="n">SCARD_CTL_CODE</span><span class="p">(</span><span class="mi">2</span><span class="p">),</span>
+                            <span class="n">toBytes</span><span class="p">(</span><span class="s">&quot;</span><span class="si">%.8lx</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">SCARD_ATTR_VENDOR_NAME</span><span class="p">))</span>
+                        <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+                            <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                                <span class="s">&#39;SCardControl failed: &#39;</span> <span class="o">+</span>\
+                                <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+                        <span class="n">r</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+                        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">response</span><span class="p">)):</span>
+                            <span class="n">r</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="si">%c</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">response</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                        <span class="k">print</span> <span class="s">&#39;SCARD_ATTR_VENDOR_NAME:&#39;</span><span class="p">,</span> <span class="n">r</span>
+                    <span class="k">elif</span> <span class="s">&#39;pcsclite&#39;</span> <span class="o">==</span> <span class="n">resourceManager</span> <span class="ow">and</span> \
+                          <span class="ow">not</span> <span class="s">&#39;pcsclite-tiger&#39;</span> <span class="o">==</span> <span class="n">resourceManagerSubType</span><span class="p">:</span>
+                        <span class="c"># get firmware on Gemplus readers</span>
+                        <span class="n">hresult</span><span class="p">,</span> <span class="n">response</span> <span class="o">=</span> <span class="n">SCardControl</span><span class="p">(</span>
+                            <span class="n">hcard</span><span class="p">,</span>
+                            <span class="n">SCARD_CTL_CODE</span><span class="p">(</span><span class="mi">1</span><span class="p">),</span>
+                            <span class="p">[</span><span class="mh">0x02</span><span class="p">])</span>
+                        <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+                            <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                                <span class="s">&#39;SCardControl failed: &#39;</span> <span class="o">+</span> \
+                                <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+                        <span class="n">r</span> <span class="o">=</span> <span class="s">&quot;&quot;</span>
+                        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">response</span><span class="p">)):</span>
+                            <span class="n">r</span> <span class="o">+=</span> <span class="s">&quot;</span><span class="si">%c</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">response</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                        <span class="k">print</span> <span class="s">&#39;Control:&#39;</span><span class="p">,</span> <span class="n">r</span>
+                <span class="k">finally</span><span class="p">:</span>
+                    <span class="n">hresult</span> <span class="o">=</span> <span class="n">SCardDisconnect</span><span class="p">(</span><span class="n">hcard</span><span class="p">,</span> <span class="n">SCARD_UNPOWER_CARD</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                            <span class="s">&#39;Failed to disconnect: &#39;</span> <span class="o">+</span> \
+                            <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+                    <span class="k">print</span> <span class="s">&#39;Disconnected&#39;</span>
+
+            <span class="k">except</span> <span class="n">error</span><span class="p">,</span> <span class="p">(</span><span class="n">message</span><span class="p">):</span>
+                <span class="k">print</span> <span class="n">error</span><span class="p">,</span> <span class="n">message</span>
+
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">hresult</span> <span class="o">=</span> <span class="n">SCardReleaseContext</span><span class="p">(</span><span class="n">hcontext</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                <span class="s">&#39;Failed to release context: &#39;</span> <span class="o">+</span> \
+                <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+        <span class="k">print</span> <span class="s">&#39;Released context.&#39;</span>
+
+<span class="k">except</span> <span class="n">error</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+    <span class="k">print</span> <span class="n">e</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="k">if</span> <span class="s">&#39;win32&#39;</span> <span class="o">==</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s">&#39;press Enter to continue&#39;</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="get-the-atr-of-a-card">
+<h2>get the ATR of a card<a class="headerlink" href="#get-the-atr-of-a-card" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#! /usr/bin/env python</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Sample for python PCSC wrapper module: get card ATR in first pcsc reader</span>
+
+<span class="sd">__author__ = &quot;http://www.gemalto.com&quot;</span>
+
+<span class="sd">Copyright 2001-2012 gemalto</span>
+<span class="sd">Author: Jean-Daniel Aussel, mailto:jean-daniel.aussel@gemalto.com</span>
+<span class="sd">Copyright 2010 Ludovic Rousseau</span>
+<span class="sd">Author: Ludovic Rousseau, mailto:ludovic.rousseau@free.fr</span>
+
+<span class="sd">This file is part of pyscard.</span>
+
+<span class="sd">pyscard is free software; you can redistribute it and/or modify</span>
+<span class="sd">it under the terms of the GNU Lesser General Public License as published by</span>
+<span class="sd">the Free Software Foundation; either version 2.1 of the License, or</span>
+<span class="sd">(at your option) any later version.</span>
+
+<span class="sd">pyscard is distributed in the hope that it will be useful,</span>
+<span class="sd">but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="sd">MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="sd">GNU Lesser General Public License for more details.</span>
+
+<span class="sd">You should have received a copy of the GNU Lesser General Public License</span>
+<span class="sd">along with pyscard; if not, write to the Free Software</span>
+<span class="sd">Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">smartcard.scard</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">smartcard.util</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">hresult</span><span class="p">,</span> <span class="n">hcontext</span> <span class="o">=</span> <span class="n">SCardEstablishContext</span><span class="p">(</span><span class="n">SCARD_SCOPE_USER</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+            <span class="s">&#39;Failed to establish context: &#39;</span> <span class="o">+</span> \
+            <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+    <span class="k">print</span> <span class="s">&#39;Context established!&#39;</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">hresult</span><span class="p">,</span> <span class="n">readers</span> <span class="o">=</span> <span class="n">SCardListReaders</span><span class="p">(</span><span class="n">hcontext</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                <span class="s">&#39;Failed to list readers: &#39;</span> <span class="o">+</span> \
+                <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">readers</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s">&#39;No smart card readers&#39;</span><span class="p">)</span>
+        <span class="k">print</span> <span class="s">&#39;PCSC Readers:&#39;</span><span class="p">,</span> <span class="n">readers</span>
+
+        <span class="k">for</span> <span class="n">reader</span> <span class="ow">in</span> <span class="n">readers</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&#39;Trying to retreive ATR of card in&#39;</span><span class="p">,</span> <span class="n">reader</span>
+
+            <span class="n">hresult</span><span class="p">,</span> <span class="n">hcard</span><span class="p">,</span> <span class="n">dwActiveProtocol</span> <span class="o">=</span> <span class="n">SCardConnect</span><span class="p">(</span>
+                <span class="n">hcontext</span><span class="p">,</span>
+                <span class="n">reader</span><span class="p">,</span>
+                <span class="n">SCARD_SHARE_SHARED</span><span class="p">,</span> <span class="n">SCARD_PROTOCOL_T0</span> <span class="o">|</span> <span class="n">SCARD_PROTOCOL_T1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+                <span class="k">print</span> <span class="s">&#39;Unable to connect: &#39;</span> <span class="o">+</span> <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+
+                <span class="k">print</span> <span class="s">&#39;Connected with active protocol&#39;</span><span class="p">,</span> <span class="n">dwActiveProtocol</span>
+
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">hresult</span><span class="p">,</span> <span class="n">reader</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">protocol</span><span class="p">,</span> <span class="n">atr</span> <span class="o">=</span> <span class="n">SCardStatus</span><span class="p">(</span><span class="n">hcard</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+                        <span class="k">print</span> <span class="s">&#39;failed to get status: &#39;</span> <span class="o">+</span> \
+                              <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">)</span>
+                    <span class="k">print</span> <span class="s">&#39;Reader:&#39;</span><span class="p">,</span> <span class="n">reader</span>
+                    <span class="k">print</span> <span class="s">&#39;State:&#39;</span><span class="p">,</span> <span class="nb">hex</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+                    <span class="k">print</span> <span class="s">&#39;Protocol:&#39;</span><span class="p">,</span> <span class="n">protocol</span>
+                    <span class="k">print</span> <span class="s">&#39;ATR:&#39;</span><span class="p">,</span> <span class="n">smartcard</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">toHexString</span><span class="p">(</span>
+                                        <span class="n">atr</span><span class="p">,</span>
+                                        <span class="n">smartcard</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">HEX</span><span class="p">)</span>
+
+                <span class="k">finally</span><span class="p">:</span>
+                    <span class="n">hresult</span> <span class="o">=</span> <span class="n">SCardDisconnect</span><span class="p">(</span><span class="n">hcard</span><span class="p">,</span> <span class="n">SCARD_UNPOWER_CARD</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+                        <span class="k">print</span> <span class="s">&#39;Failed to disconnect: &#39;</span> <span class="o">+</span> \
+                            <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">)</span>
+                    <span class="k">print</span> <span class="s">&#39;Disconnected&#39;</span>
+
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">hresult</span> <span class="o">=</span> <span class="n">SCardReleaseContext</span><span class="p">(</span><span class="n">hcontext</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">error</span><span class="p">(</span><span class="s">&#39;Failed to release context: &#39;</span> <span class="o">+</span> \
+                            <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+        <span class="k">print</span> <span class="s">&#39;Released context.&#39;</span>
+
+<span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+    <span class="k">print</span> <span class="n">e</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="k">if</span> <span class="s">&#39;win32&#39;</span> <span class="o">==</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s">&#39;press Enter to continue&#39;</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="get-the-attributes-of-a-card">
+<h2>get the attributes of a card<a class="headerlink" href="#get-the-attributes-of-a-card" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#! /usr/bin/env python</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Sample for python PCSC wrapper module: List card attributes</span>
+
+<span class="sd">__author__ = &quot;http://www.gemalto.com&quot;</span>
+
+<span class="sd">Copyright 2001-2012 gemalto</span>
+<span class="sd">Author: Jean-Daniel Aussel, mailto:jean-daniel.aussel@gemalto.com</span>
+<span class="sd">Copyright 2010 Ludovic Rousseau</span>
+<span class="sd">Author: Ludovic Rousseau, mailto:ludovic.rousseau@free.fr</span>
+
+<span class="sd">This file is part of pyscard.</span>
+
+<span class="sd">pyscard is free software; you can redistribute it and/or modify</span>
+<span class="sd">it under the terms of the GNU Lesser General Public License as published by</span>
+<span class="sd">the Free Software Foundation; either version 2.1 of the License, or</span>
+<span class="sd">(at your option) any later version.</span>
+
+<span class="sd">pyscard is distributed in the hope that it will be useful,</span>
+<span class="sd">but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="sd">MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="sd">GNU Lesser General Public License for more details.</span>
+
+<span class="sd">You should have received a copy of the GNU Lesser General Public License</span>
+<span class="sd">along with pyscard; if not, write to the Free Software</span>
+<span class="sd">Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">struct</span>
+<span class="kn">from</span> <span class="nn">smartcard.scard</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">smartcard.util</span>
+
+<span class="k">if</span> <span class="s">&#39;pcsclite-tiger&#39;</span> <span class="o">==</span> <span class="n">resourceManagerSubType</span><span class="p">:</span>
+    <span class="n">attributes</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">attributes</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="n">SCARD_ATTR_ATR_STRING</span><span class="p">:</span> <span class="s">&#39;SCARD_ATTR_ATR_STRING&#39;</span><span class="p">,</span>
+        <span class="n">SCARD_ATTR_CHANNEL_ID</span><span class="p">:</span> <span class="s">&#39;SCARD_ATTR_CHANNEL_ID&#39;</span><span class="p">,</span>
+        <span class="n">SCARD_ATTR_CHARACTERISTICS</span><span class="p">:</span> <span class="s">&#39;SCARD_ATTR_CHARACTERISTICS&#39;</span><span class="p">,</span>
+        <span class="n">SCARD_ATTR_CURRENT_BWT</span><span class="p">:</span> <span class="s">&#39;SCARD_ATTR_CURRENT_BWT&#39;</span><span class="p">,</span>
+        <span class="n">SCARD_ATTR_CURRENT_CLK</span><span class="p">:</span> <span class="s">&#39;SCARD_ATTR_CURRENT_CLK&#39;</span><span class="p">,</span>
+        <span class="n">SCARD_ATTR_CURRENT_CWT</span><span class="p">:</span> <span class="s">&#39;SCARD_ATTR_CURRENT_CWT&#39;</span><span class="p">,</span>
+        <span class="n">SCARD_ATTR_CURRENT_D</span><span class="p">:</span> <span class="s">&#39;SCARD_ATTR_CURRENT_D&#39;</span><span class="p">,</span>
+        <span class="n">SCARD_ATTR_CURRENT_EBC_ENCODING</span><span class="p">:</span> <span class="s">&#39;SCARD_ATTR_CURRENT_EBC_ENCODING&#39;</span><span class="p">,</span>
+        <span class="n">SCARD_ATTR_CURRENT_F</span><span class="p">:</span> <span class="s">&#39;SCARD_ATTR_CURRENT_F&#39;</span><span class="p">,</span>
+        <span class="n">SCARD_ATTR_CURRENT_IFSC</span><span class="p">:</span> <span class="s">&#39;SCARD_ATTR_CURRENT_IFSC&#39;</span><span class="p">,</span>
+        <span class="n">SCARD_ATTR_CURRENT_IFSD</span><span class="p">:</span> <span class="s">&#39;SCARD_ATTR_CURRENT_IFSD&#39;</span><span class="p">,</span>
+        <span class="n">SCARD_ATTR_CURRENT_IO_STATE</span><span class="p">:</span> <span class="s">&#39;SCARD_ATTR_CURRENT_IO_STATE&#39;</span><span class="p">,</span>
+        <span class="n">SCARD_ATTR_CURRENT_N</span><span class="p">:</span> <span class="s">&#39;SCARD_ATTR_CURRENT_N&#39;</span><span class="p">,</span>
+        <span class="n">SCARD_ATTR_CURRENT_PROTOCOL_TYPE</span><span class="p">:</span> <span class="s">&#39;SCARD_ATTR_CURRENT_PROTOCOL_TYPE&#39;</span><span class="p">,</span>
+        <span class="n">SCARD_ATTR_CURRENT_W</span><span class="p">:</span> <span class="s">&#39;SCARD_ATTR_CURRENT_W&#39;</span><span class="p">,</span>
+        <span class="n">SCARD_ATTR_DEFAULT_CLK</span><span class="p">:</span> <span class="s">&#39;SCARD_ATTR_DEFAULT_CLK&#39;</span><span class="p">,</span>
+        <span class="n">SCARD_ATTR_DEFAULT_DATA_RATE</span><span class="p">:</span> <span class="s">&#39;SCARD_ATTR_DEFAULT_DATA_RATE&#39;</span><span class="p">,</span>
+        <span class="n">SCARD_ATTR_DEVICE_FRIENDLY_NAME_A</span><span class="p">:</span> <span class="s">&#39;SCARD_ATTR_DEVICE_FRIENDLY_NAME_A&#39;</span><span class="p">,</span>
+        <span class="n">SCARD_ATTR_DEVICE_FRIENDLY_NAME_W</span><span class="p">:</span> <span class="s">&#39;SCARD_ATTR_DEVICE_FRIENDLY_NAME_W&#39;</span><span class="p">,</span>
+        <span class="n">SCARD_ATTR_DEVICE_IN_USE</span><span class="p">:</span> <span class="s">&#39;SCARD_ATTR_DEVICE_IN_USE&#39;</span><span class="p">,</span>
+        <span class="n">SCARD_ATTR_DEVICE_SYSTEM_NAME_A</span><span class="p">:</span> <span class="s">&#39;SCARD_ATTR_DEVICE_SYSTEM_NAME_A&#39;</span><span class="p">,</span>
+        <span class="n">SCARD_ATTR_DEVICE_SYSTEM_NAME_W</span><span class="p">:</span> <span class="s">&#39;SCARD_ATTR_DEVICE_SYSTEM_NAME_W&#39;</span><span class="p">,</span>
+        <span class="n">SCARD_ATTR_DEVICE_UNIT</span><span class="p">:</span> <span class="s">&#39;SCARD_ATTR_DEVICE_UNIT&#39;</span><span class="p">,</span>
+        <span class="n">SCARD_ATTR_ESC_AUTHREQUEST</span><span class="p">:</span> <span class="s">&#39;SCARD_ATTR_ESC_AUTHREQUEST&#39;</span><span class="p">,</span>
+        <span class="n">SCARD_ATTR_ESC_CANCEL</span><span class="p">:</span> <span class="s">&#39;SCARD_ATTR_ESC_CANCEL&#39;</span><span class="p">,</span>
+        <span class="n">SCARD_ATTR_ESC_RESET</span><span class="p">:</span> <span class="s">&#39;SCARD_ATTR_ESC_RESET&#39;</span><span class="p">,</span>
+        <span class="n">SCARD_ATTR_EXTENDED_BWT</span><span class="p">:</span> <span class="s">&#39;SCARD_ATTR_EXTENDED_BWT&#39;</span><span class="p">,</span>
+        <span class="n">SCARD_ATTR_ICC_INTERFACE_STATUS</span><span class="p">:</span> <span class="s">&#39;SCARD_ATTR_ICC_INTERFACE_STATUS&#39;</span><span class="p">,</span>
+        <span class="n">SCARD_ATTR_ICC_PRESENCE</span><span class="p">:</span> <span class="s">&#39;SCARD_ATTR_ICC_PRESENCE&#39;</span><span class="p">,</span>
+        <span class="n">SCARD_ATTR_ICC_TYPE_PER_ATR</span><span class="p">:</span> <span class="s">&#39;SCARD_ATTR_ICC_TYPE_PER_ATR&#39;</span><span class="p">,</span>
+        <span class="n">SCARD_ATTR_MAXINPUT</span><span class="p">:</span> <span class="s">&#39;SCARD_ATTR_MAXINPUT&#39;</span><span class="p">,</span>
+        <span class="n">SCARD_ATTR_MAX_CLK</span><span class="p">:</span> <span class="s">&#39;SCARD_ATTR_MAX_CLK&#39;</span><span class="p">,</span>
+        <span class="n">SCARD_ATTR_MAX_DATA_RATE</span><span class="p">:</span> <span class="s">&#39;SCARD_ATTR_MAX_DATA_RATE&#39;</span><span class="p">,</span>
+        <span class="n">SCARD_ATTR_MAX_IFSD</span><span class="p">:</span> <span class="s">&#39;SCARD_ATTR_MAX_IFSD&#39;</span><span class="p">,</span>
+        <span class="n">SCARD_ATTR_POWER_MGMT_SUPPORT</span><span class="p">:</span> <span class="s">&#39;SCARD_ATTR_POWER_MGMT_SUPPORT&#39;</span><span class="p">,</span>
+        <span class="n">SCARD_ATTR_SUPRESS_T1_IFS_REQUEST</span><span class="p">:</span> <span class="s">&#39;SCARD_ATTR_SUPRESS_T1_IFS_REQUEST&#39;</span><span class="p">,</span>
+        <span class="n">SCARD_ATTR_USER_AUTH_INPUT_DEVICE</span><span class="p">:</span> <span class="s">&#39;SCARD_ATTR_USER_AUTH_INPUT_DEVICE&#39;</span><span class="p">,</span>
+        <span class="n">SCARD_ATTR_USER_TO_CARD_AUTH_DEVICE</span><span class="p">:</span> \
+            <span class="s">&#39;SCARD_ATTR_USER_TO_CARD_AUTH_DEVICE&#39;</span><span class="p">,</span>
+        <span class="n">SCARD_ATTR_VENDOR_IFD_SERIAL_NO</span><span class="p">:</span> <span class="s">&#39;SCARD_ATTR_VENDOR_IFD_SERIAL_NO&#39;</span><span class="p">,</span>
+        <span class="n">SCARD_ATTR_VENDOR_IFD_TYPE</span><span class="p">:</span> <span class="s">&#39;SCARD_ATTR_VENDOR_IFD_TYPE&#39;</span><span class="p">,</span>
+        <span class="n">SCARD_ATTR_VENDOR_IFD_VERSION</span><span class="p">:</span> <span class="s">&#39;SCARD_ATTR_VENDOR_IFD_VERSION&#39;</span><span class="p">,</span>
+        <span class="n">SCARD_ATTR_VENDOR_NAME</span><span class="p">:</span> <span class="s">&#39;SCARD_ATTR_VENDOR_NAME&#39;</span><span class="p">}</span>
+    <span class="k">if</span> <span class="s">&#39;pcsclite&#39;</span> <span class="o">==</span> <span class="n">resourceManager</span><span class="p">:</span>
+        <span class="n">extra_attributes</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">SCARD_ATTR_ASYNC_PROTOCOL_TYPES</span><span class="p">:</span> <span class="s">&#39;SCARD_ATTR_ASYNC_PROTOCOL_TYPES&#39;</span><span class="p">,</span>
+            <span class="n">SCARD_ATTR_SYNC_PROTOCOL_TYPES</span><span class="p">:</span> <span class="s">&#39;SCARD_ATTR_SYNC_PROTOCOL_TYPES&#39;</span><span class="p">}</span>
+        <span class="n">attributes</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">extra_attributes</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">printAttribute</span><span class="p">(</span><span class="n">attrib</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+    <span class="k">print</span> <span class="s">&#39;-----------------&#39;</span><span class="p">,</span> <span class="n">attributes</span><span class="p">[</span><span class="n">attrib</span><span class="p">],</span> <span class="s">&#39;-----------------&#39;</span>
+    <span class="k">print</span> <span class="n">value</span>
+    <span class="k">print</span> <span class="n">smartcard</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">toHexString</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">smartcard</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">HEX</span><span class="p">)</span>
+    <span class="k">print</span> <span class="nb">apply</span><span class="p">(</span><span class="n">struct</span><span class="o">.</span><span class="n">pack</span><span class="p">,</span> <span class="p">[</span><span class="s">&#39;&lt;&#39;</span> <span class="o">+</span> <span class="s">&#39;B&#39;</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">value</span><span class="p">)]</span> <span class="o">+</span> <span class="n">value</span><span class="p">)</span>
+
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">hresult</span><span class="p">,</span> <span class="n">hcontext</span> <span class="o">=</span> <span class="n">SCardEstablishContext</span><span class="p">(</span><span class="n">SCARD_SCOPE_USER</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+            <span class="s">&#39;Failed to establish context: &#39;</span> <span class="o">+</span> \
+            <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+    <span class="k">print</span> <span class="s">&#39;Context established!&#39;</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">hresult</span><span class="p">,</span> <span class="n">readers</span> <span class="o">=</span> <span class="n">SCardListReaders</span><span class="p">(</span><span class="n">hcontext</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                <span class="s">&#39;Failed to list readers: &#39;</span> <span class="o">+</span> \
+                <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+        <span class="k">print</span> <span class="s">&#39;PCSC Readers:&#39;</span><span class="p">,</span> <span class="n">readers</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">readers</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">error</span><span class="p">(</span><span class="s">&#39;No smart card readers&#39;</span><span class="p">)</span>
+        <span class="k">print</span> <span class="s">&#39;Trying to retreive attributes of&#39;</span><span class="p">,</span> <span class="n">readers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="k">for</span> <span class="n">reader</span> <span class="ow">in</span> <span class="n">readers</span><span class="p">:</span>
+            <span class="n">hresult</span><span class="p">,</span> <span class="n">hcard</span><span class="p">,</span> <span class="n">dwActiveProtocol</span> <span class="o">=</span> <span class="n">SCardConnect</span><span class="p">(</span>
+                <span class="n">hcontext</span><span class="p">,</span>
+                <span class="n">reader</span><span class="p">,</span>
+                <span class="n">SCARD_SHARE_SHARED</span><span class="p">,</span> <span class="n">SCARD_PROTOCOL_T0</span> <span class="o">|</span> <span class="n">SCARD_PROTOCOL_T1</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+                <span class="k">print</span> <span class="n">error</span><span class="p">,</span> \
+                    <span class="s">&#39;Unable to connect: &#39;</span> <span class="o">+</span> <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+
+                <span class="k">print</span> <span class="s">&#39;Connected with active protocol&#39;</span><span class="p">,</span> <span class="n">dwActiveProtocol</span>
+
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">attributes</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+                        <span class="n">hresult</span><span class="p">,</span> <span class="n">attrib</span> <span class="o">=</span> <span class="n">SCardGetAttrib</span><span class="p">(</span><span class="n">hcard</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">hresult</span> <span class="o">==</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+                            <span class="n">printAttribute</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">attrib</span><span class="p">)</span>
+                        <span class="k">else</span><span class="p">:</span>
+                            <span class="k">print</span> <span class="s">&#39;-----------------&#39;</span><span class="p">,</span> \
+                                <span class="n">attributes</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> \
+                                <span class="s">&#39;-----------------&#39;</span>
+                            <span class="k">print</span> <span class="s">&#39;unsupported&#39;</span>
+
+                <span class="k">finally</span><span class="p">:</span>
+                    <span class="n">hresult</span> <span class="o">=</span> <span class="n">SCardDisconnect</span><span class="p">(</span><span class="n">hcard</span><span class="p">,</span> <span class="n">SCARD_UNPOWER_CARD</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                            <span class="s">&#39;Failed to disconnect: &#39;</span> <span class="o">+</span> \
+                            <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+                    <span class="k">print</span> <span class="s">&#39;Disconnected&#39;</span>
+
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">hresult</span> <span class="o">=</span> <span class="n">SCardReleaseContext</span><span class="p">(</span><span class="n">hcontext</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                <span class="s">&#39;Failed to release context: &#39;</span> <span class="o">+</span> \
+                <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+        <span class="k">print</span> <span class="s">&#39;Released context.&#39;</span>
+
+<span class="k">except</span> <span class="ne">Exception</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+    <span class="k">print</span> <span class="n">e</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="k">if</span> <span class="s">&#39;win32&#39;</span> <span class="o">==</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s">&#39;press Enter to continue&#39;</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="wait-for-card-insertion-removal">
+<h2>wait for card insertion/removal<a class="headerlink" href="#wait-for-card-insertion-removal" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#! /usr/bin/env python</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Sample for python PCSC wrapper module: Detect card insertion/removal</span>
+
+<span class="sd">__author__ = &quot;http://www.gemalto.com&quot;</span>
+
+<span class="sd">Copyright 2001-2012 gemalto</span>
+<span class="sd">Author: Jean-Daniel Aussel, mailto:jean-daniel.aussel@gemalto.com</span>
+<span class="sd">Copyright 2010 Ludovic Rousseau</span>
+<span class="sd">Author: Ludovic Rousseau, mailto:ludovic.rousseau@free.fr</span>
+
+<span class="sd">This file is part of pyscard.</span>
+
+<span class="sd">pyscard is free software; you can redistribute it and/or modify</span>
+<span class="sd">it under the terms of the GNU Lesser General Public License as published by</span>
+<span class="sd">the Free Software Foundation; either version 2.1 of the License, or</span>
+<span class="sd">(at your option) any later version.</span>
+
+<span class="sd">pyscard is distributed in the hope that it will be useful,</span>
+<span class="sd">but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="sd">MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="sd">GNU Lesser General Public License for more details.</span>
+
+<span class="sd">You should have received a copy of the GNU Lesser General Public License</span>
+<span class="sd">along with pyscard; if not, write to the Free Software</span>
+<span class="sd">Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">smartcard.scard</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">smartcard.util</span>
+
+<span class="n">srTreeATR</span> <span class="o">=</span> \
+    <span class="p">[</span><span class="mh">0x3B</span><span class="p">,</span> <span class="mh">0x77</span><span class="p">,</span> <span class="mh">0x94</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x82</span><span class="p">,</span> <span class="mh">0x30</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x13</span><span class="p">,</span> <span class="mh">0x6C</span><span class="p">,</span> <span class="mh">0x9F</span><span class="p">,</span> <span class="mh">0x22</span><span class="p">]</span>
+<span class="n">srTreeMask</span> <span class="o">=</span> \
+    <span class="p">[</span><span class="mh">0xFF</span><span class="p">,</span> <span class="mh">0xFF</span><span class="p">,</span> <span class="mh">0xFF</span><span class="p">,</span> <span class="mh">0xFF</span><span class="p">,</span> <span class="mh">0xFF</span><span class="p">,</span> <span class="mh">0xFF</span><span class="p">,</span> <span class="mh">0xFF</span><span class="p">,</span> <span class="mh">0xFF</span><span class="p">,</span> <span class="mh">0xFF</span><span class="p">,</span> <span class="mh">0xFF</span><span class="p">,</span> <span class="mh">0xFF</span><span class="p">,</span> <span class="mh">0xFF</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">printstate</span><span class="p">(</span><span class="n">state</span><span class="p">):</span>
+    <span class="n">reader</span><span class="p">,</span> <span class="n">eventstate</span><span class="p">,</span> <span class="n">atr</span> <span class="o">=</span> <span class="n">state</span>
+    <span class="k">print</span> <span class="n">reader</span> <span class="o">+</span> <span class="s">&quot; &quot;</span> <span class="o">+</span> <span class="n">smartcard</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">toHexString</span><span class="p">(</span><span class="n">atr</span><span class="p">,</span> <span class="n">smartcard</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">HEX</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">eventstate</span> <span class="o">&amp;</span> <span class="n">SCARD_STATE_ATRMATCH</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">Card found&#39;</span>
+    <span class="k">if</span> <span class="n">eventstate</span> <span class="o">&amp;</span> <span class="n">SCARD_STATE_UNAWARE</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">State unware&#39;</span>
+    <span class="k">if</span> <span class="n">eventstate</span> <span class="o">&amp;</span> <span class="n">SCARD_STATE_IGNORE</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">Ignore reader&#39;</span>
+    <span class="k">if</span> <span class="n">eventstate</span> <span class="o">&amp;</span> <span class="n">SCARD_STATE_UNAVAILABLE</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">Reader unavailable&#39;</span>
+    <span class="k">if</span> <span class="n">eventstate</span> <span class="o">&amp;</span> <span class="n">SCARD_STATE_EMPTY</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">Reader empty&#39;</span>
+    <span class="k">if</span> <span class="n">eventstate</span> <span class="o">&amp;</span> <span class="n">SCARD_STATE_PRESENT</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">Card present in reader&#39;</span>
+    <span class="k">if</span> <span class="n">eventstate</span> <span class="o">&amp;</span> <span class="n">SCARD_STATE_EXCLUSIVE</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">Card allocated for exclusive use by another application&#39;</span>
+    <span class="k">if</span> <span class="n">eventstate</span> <span class="o">&amp;</span> <span class="n">SCARD_STATE_INUSE</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">Card in used by another application but can be shared&#39;</span>
+    <span class="k">if</span> <span class="n">eventstate</span> <span class="o">&amp;</span> <span class="n">SCARD_STATE_MUTE</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">Card is mute&#39;</span>
+    <span class="k">if</span> <span class="n">eventstate</span> <span class="o">&amp;</span> <span class="n">SCARD_STATE_CHANGED</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">State changed&#39;</span>
+    <span class="k">if</span> <span class="n">eventstate</span> <span class="o">&amp;</span> <span class="n">SCARD_STATE_UNKNOWN</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&#39;</span><span class="se">\t</span><span class="s">State unknowned&#39;</span>
+
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">hresult</span><span class="p">,</span> <span class="n">hcontext</span> <span class="o">=</span> <span class="n">SCardEstablishContext</span><span class="p">(</span><span class="n">SCARD_SCOPE_USER</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+            <span class="s">&#39;Failed to establish context: &#39;</span> <span class="o">+</span> \
+            <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+    <span class="k">print</span> <span class="s">&#39;Context established!&#39;</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">hresult</span><span class="p">,</span> <span class="n">readers</span> <span class="o">=</span> <span class="n">SCardListReaders</span><span class="p">(</span><span class="n">hcontext</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                <span class="s">&#39;Failed to list readers: &#39;</span> <span class="o">+</span> \
+                <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+        <span class="k">print</span> <span class="s">&#39;PCSC Readers:&#39;</span><span class="p">,</span> <span class="n">readers</span>
+
+        <span class="n">readerstates</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">readers</span><span class="p">)):</span>
+            <span class="n">readerstates</span> <span class="o">+=</span> <span class="p">[(</span><span class="n">readers</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">SCARD_STATE_UNAWARE</span><span class="p">)]</span>
+
+        <span class="k">print</span> <span class="s">&#39;----- Current reader and card states are: -------&#39;</span>
+        <span class="n">hresult</span><span class="p">,</span> <span class="n">newstates</span> <span class="o">=</span> <span class="n">SCardGetStatusChange</span><span class="p">(</span><span class="n">hcontext</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="n">readerstates</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">newstates</span><span class="p">:</span>
+            <span class="n">printstate</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+
+        <span class="k">print</span> <span class="s">&#39;----- Please insert or remove a card ------------&#39;</span>
+        <span class="n">hresult</span><span class="p">,</span> <span class="n">newstates</span> <span class="o">=</span> <span class="n">SCardGetStatusChange</span><span class="p">(</span>
+                                <span class="n">hcontext</span><span class="p">,</span>
+                                <span class="n">INFINITE</span><span class="p">,</span>
+                                <span class="n">newstates</span><span class="p">)</span>
+
+        <span class="k">print</span> <span class="s">&#39;----- New reader and card states are: -----------&#39;</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">newstates</span><span class="p">:</span>
+            <span class="n">printstate</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">hresult</span> <span class="o">=</span> <span class="n">SCardReleaseContext</span><span class="p">(</span><span class="n">hcontext</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                <span class="s">&#39;Failed to release context: &#39;</span> <span class="o">+</span> \
+                <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+        <span class="k">print</span> <span class="s">&#39;Released context.&#39;</span>
+
+    <span class="kn">import</span> <span class="nn">sys</span>
+    <span class="k">if</span> <span class="s">&#39;win32&#39;</span> <span class="o">==</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&#39;press Enter to continue&#39;</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="k">except</span> <span class="n">error</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+    <span class="k">print</span> <span class="n">e</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="list-the-cards-introduced-in-the-system">
+<h2>list the cards introduced in the system<a class="headerlink" href="#list-the-cards-introduced-in-the-system" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#! /usr/bin/env python</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Sample for python PCSC wrapper module: List cards introduced in the system</span>
+
+<span class="sd">__author__ = &quot;http://www.gemalto.com&quot;</span>
+
+<span class="sd">Copyright 2001-2012 gemalto</span>
+<span class="sd">Author: Jean-Daniel Aussel, mailto:jean-daniel.aussel@gemalto.com</span>
+<span class="sd">Copyright 2010 Ludovic Rousseau</span>
+<span class="sd">Author: Ludovic Rousseau, mailto:ludovic.rousseau@free.fr</span>
+
+<span class="sd">This file is part of pyscard.</span>
+
+<span class="sd">pyscard is free software; you can redistribute it and/or modify</span>
+<span class="sd">it under the terms of the GNU Lesser General Public License as published by</span>
+<span class="sd">the Free Software Foundation; either version 2.1 of the License, or</span>
+<span class="sd">(at your option) any later version.</span>
+
+<span class="sd">pyscard is distributed in the hope that it will be useful,</span>
+<span class="sd">but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="sd">MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="sd">GNU Lesser General Public License for more details.</span>
+
+<span class="sd">You should have received a copy of the GNU Lesser General Public License</span>
+<span class="sd">along with pyscard; if not, write to the Free Software</span>
+<span class="sd">Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">smartcard.scard</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="k">if</span> <span class="s">&#39;winscard&#39;</span> <span class="o">==</span> <span class="n">resourceManager</span><span class="p">:</span>
+    <span class="c"># Cryptoflex 8k v2 is introduced in standard Windows 2000</span>
+    <span class="n">slbCryptoFlex8kv2ATR</span> <span class="o">=</span> \
+        <span class="p">[</span><span class="mh">0x3B</span><span class="p">,</span> <span class="mh">0x95</span><span class="p">,</span> <span class="mh">0x15</span><span class="p">,</span> <span class="mh">0x40</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x68</span><span class="p">,</span> <span class="mh">0x01</span><span class="p">,</span> <span class="mh">0x02</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">]</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">hresult</span><span class="p">,</span> <span class="n">hcontext</span> <span class="o">=</span> <span class="n">SCardEstablishContext</span><span class="p">(</span><span class="n">SCARD_SCOPE_USER</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                <span class="s">&#39;Failed to establish context: &#39;</span> <span class="o">+</span> \
+                <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+        <span class="k">print</span> <span class="s">&#39;Context established!&#39;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">hresult</span><span class="p">,</span> <span class="n">card</span> <span class="o">=</span> <span class="n">SCardListCards</span><span class="p">(</span><span class="n">hcontext</span><span class="p">,</span> <span class="n">slbCryptoFlex8kv2ATR</span><span class="p">,</span> <span class="p">[])</span>
+            <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                    <span class="s">&#39;Failure to locate Schlumberger Cryptoflex 8k v2 card: &#39;</span> <span class="o">+</span>\
+                    <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+            <span class="k">print</span> <span class="s">&#39;Located by ATR:&#39;</span><span class="p">,</span> <span class="n">card</span>
+
+            <span class="n">hresult</span><span class="p">,</span> <span class="n">cards</span> <span class="o">=</span> <span class="n">SCardListCards</span><span class="p">(</span><span class="n">hcontext</span><span class="p">,</span> <span class="p">[],</span> <span class="p">[])</span>
+            <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                    <span class="s">&#39;Failure to list cards: &#39;</span> <span class="o">+</span> \
+                    <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+            <span class="k">print</span> <span class="s">&#39;Cards:&#39;</span><span class="p">,</span> <span class="n">cards</span>
+
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">cards</span><span class="p">:</span>
+                <span class="n">hresult</span><span class="p">,</span> <span class="n">providerguid</span> <span class="o">=</span> <span class="n">SCardGetCardTypeProviderName</span><span class="p">(</span>
+                    <span class="n">hcontext</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">SCARD_PROVIDER_PRIMARY</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">hresult</span> <span class="o">==</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+                    <span class="k">print</span> <span class="n">i</span><span class="p">,</span> <span class="s">&#39;Primary provider:&#39;</span><span class="p">,</span> <span class="n">providername</span>
+                <span class="n">hresult</span><span class="p">,</span> <span class="n">providername</span> <span class="o">=</span> <span class="n">SCardGetCardTypeProviderName</span><span class="p">(</span>
+                    <span class="n">hcontext</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">SCARD_PROVIDER_CSP</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">hresult</span> <span class="o">==</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+                    <span class="k">print</span> <span class="n">i</span><span class="p">,</span> <span class="s">&#39;CSP Provider:&#39;</span><span class="p">,</span> <span class="n">providername</span>
+
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">hresult</span> <span class="o">=</span> <span class="n">SCardReleaseContext</span><span class="p">(</span><span class="n">hcontext</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                    <span class="s">&#39;Failed to release context: &#39;</span> <span class="o">+</span> \
+                    <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+            <span class="k">print</span> <span class="s">&#39;Released context.&#39;</span>
+
+    <span class="k">except</span> <span class="n">error</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">print</span> <span class="n">e</span>
+
+<span class="k">elif</span> <span class="s">&#39;pcsclite&#39;</span> <span class="o">==</span> <span class="n">resourceManager</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s">&#39;SCardListCards not supported by pcsc lite&#39;</span>
+
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="k">if</span> <span class="s">&#39;win32&#39;</span> <span class="o">==</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s">&#39;press Enter to continue&#39;</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="list-the-interfaces-supported-by-a-card">
+<h2>list the interfaces supported by a card<a class="headerlink" href="#list-the-interfaces-supported-by-a-card" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#! /usr/bin/env python</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Sample for python PCSC wrapper module: List card interfaces</span>
+
+<span class="sd">__author__ = &quot;http://www.gemalto.com&quot;</span>
+
+<span class="sd">Copyright 2001-2012 gemalto</span>
+<span class="sd">Author: Jean-Daniel Aussel, mailto:jean-daniel.aussel@gemalto.com</span>
+<span class="sd">Copyright 2010 Ludovic Rousseau</span>
+<span class="sd">Author: Ludovic Rousseau, mailto:ludovic.rousseau@free.fr</span>
+
+<span class="sd">This file is part of pyscard.</span>
+
+<span class="sd">pyscard is free software; you can redistribute it and/or modify</span>
+<span class="sd">it under the terms of the GNU Lesser General Public License as published by</span>
+<span class="sd">the Free Software Foundation; either version 2.1 of the License, or</span>
+<span class="sd">(at your option) any later version.</span>
+
+<span class="sd">pyscard is distributed in the hope that it will be useful,</span>
+<span class="sd">but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="sd">MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="sd">GNU Lesser General Public License for more details.</span>
+
+<span class="sd">You should have received a copy of the GNU Lesser General Public License</span>
+<span class="sd">along with pyscard; if not, write to the Free Software</span>
+<span class="sd">Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">platform</span>
+<span class="kn">from</span> <span class="nn">smartcard.scard</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">smartcard.guid</span>
+
+<span class="k">if</span> <span class="s">&#39;winscard&#39;</span> <span class="o">==</span> <span class="n">resourceManager</span><span class="p">:</span>
+
+    <span class="n">znewcardName</span> <span class="o">=</span> <span class="s">&#39;dummy-card&#39;</span>
+    <span class="n">znewcardATR</span> <span class="o">=</span> \
+      <span class="p">[</span><span class="mh">0x3B</span><span class="p">,</span> <span class="mh">0x77</span><span class="p">,</span> <span class="mh">0x94</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x82</span><span class="p">,</span> <span class="mh">0x30</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x13</span><span class="p">,</span> <span class="mh">0x6C</span><span class="p">,</span> <span class="mh">0x9F</span><span class="p">,</span> <span class="mh">0x22</span><span class="p">]</span>
+    <span class="n">znewcardMask</span> <span class="o">=</span> \
+      <span class="p">[</span><span class="mh">0xFF</span><span class="p">,</span> <span class="mh">0xFF</span><span class="p">,</span> <span class="mh">0xFF</span><span class="p">,</span> <span class="mh">0xFF</span><span class="p">,</span> <span class="mh">0xFF</span><span class="p">,</span> <span class="mh">0xFF</span><span class="p">,</span> <span class="mh">0xFF</span><span class="p">,</span> <span class="mh">0xFF</span><span class="p">,</span> <span class="mh">0xFF</span><span class="p">,</span> <span class="mh">0xFF</span><span class="p">,</span> <span class="mh">0xFF</span><span class="p">,</span> <span class="mh">0xFF</span><span class="p">]</span>
+    <span class="n">znewcardPrimGuid</span> <span class="o">=</span> \
+        <span class="n">smartcard</span><span class="o">.</span><span class="n">guid</span><span class="o">.</span><span class="n">strToGUID</span><span class="p">(</span><span class="s">&#39;{128F3806-4F70-4ccf-977A-60C390664840}&#39;</span><span class="p">)</span>
+    <span class="n">znewcardSecGuid</span> <span class="o">=</span> \
+        <span class="n">smartcard</span><span class="o">.</span><span class="n">guid</span><span class="o">.</span><span class="n">strToGUID</span><span class="p">(</span><span class="s">&#39;{EB7F69EA-BA20-47d0-8C50-11CFDEB63BBE}&#39;</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">hresult</span><span class="p">,</span> <span class="n">hcontext</span> <span class="o">=</span> <span class="n">SCardEstablishContext</span><span class="p">(</span><span class="n">SCARD_SCOPE_USER</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">scard</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="s">&#39;Failed to establish context: &#39;</span> <span class="o">+</span> \
+                <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+        <span class="k">print</span> <span class="s">&#39;Context established!&#39;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+
+            <span class="c"># list interfaces for a known card</span>
+            <span class="k">if</span> <span class="o">-</span><span class="mi">1</span> <span class="o">!=</span> <span class="n">platform</span><span class="o">.</span><span class="n">platform</span><span class="p">()</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s">&#39;Windows-7&#39;</span><span class="p">):</span>
+                <span class="n">expectedCard</span> <span class="o">=</span> <span class="s">&#39;Identity Device (Microsoft Generic Profile)&#39;</span>
+            <span class="k">elif</span> <span class="o">-</span><span class="mi">1</span> <span class="o">!=</span> <span class="n">platform</span><span class="o">.</span><span class="n">platform</span><span class="p">()</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="s">&#39;Windows-Vista-6.0&#39;</span><span class="p">):</span>
+                <span class="n">expectedCard</span> <span class="o">=</span> <span class="s">&#39;Axalto Cryptoflex .NET&#39;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">expectedCard</span> <span class="o">=</span> <span class="s">&#39;Schlumberger Cryptoflex 8k v2&#39;</span>
+            <span class="n">hresult</span><span class="p">,</span> <span class="n">interfaces</span> <span class="o">=</span> <span class="n">SCardListInterfaces</span><span class="p">(</span>
+                <span class="n">hcontext</span><span class="p">,</span>
+                <span class="n">expectedCard</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">scard</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                    <span class="s">&#39;Failed to list interfaces: &#39;</span> <span class="o">+</span> \
+                    <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+            <span class="k">print</span> <span class="s">&#39;Interfaces for &#39;</span><span class="p">,</span> <span class="n">expectedCard</span><span class="p">,</span> <span class="s">&#39;:&#39;</span><span class="p">,</span> <span class="n">interfaces</span>
+
+            <span class="c"># introduce a card (forget first in case it is already present)</span>
+            <span class="n">hresult</span> <span class="o">=</span> <span class="n">SCardForgetCardType</span><span class="p">(</span><span class="n">hcontext</span><span class="p">,</span> <span class="n">znewcardName</span><span class="p">)</span>
+            <span class="k">print</span> <span class="s">&#39;Introducing card &#39;</span> <span class="o">+</span> <span class="n">znewcardName</span>
+            <span class="n">hresult</span> <span class="o">=</span> <span class="n">SCardIntroduceCardType</span><span class="p">(</span>
+                <span class="n">hcontext</span><span class="p">,</span>
+                <span class="n">znewcardName</span><span class="p">,</span>
+                <span class="n">znewcardPrimGuid</span><span class="p">,</span>
+                <span class="n">znewcardPrimGuid</span> <span class="o">+</span> <span class="n">znewcardSecGuid</span><span class="p">,</span>
+                <span class="n">znewcardATR</span><span class="p">,</span>
+                <span class="n">znewcardMask</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                        <span class="s">&#39;Failed to introduce card type: &#39;</span> <span class="o">+</span> \
+                        <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+
+            <span class="c"># list card interfaces</span>
+            <span class="n">hresult</span><span class="p">,</span> <span class="n">interfaces</span> <span class="o">=</span> <span class="n">SCardListInterfaces</span><span class="p">(</span><span class="n">hcontext</span><span class="p">,</span> <span class="n">znewcardName</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                    <span class="s">&#39;Failed to list interfaces: &#39;</span> <span class="o">+</span> \
+                    <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">interfaces</span><span class="p">:</span>
+                <span class="k">print</span> <span class="s">&#39;Interface for &#39;</span> <span class="o">+</span> <span class="n">znewcardName</span> <span class="o">+</span> <span class="s">&#39; :&#39;</span><span class="p">,</span> \
+                      <span class="n">smartcard</span><span class="o">.</span><span class="n">guid</span><span class="o">.</span><span class="n">GUIDToStr</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+
+            <span class="k">print</span> <span class="s">&#39;Forgeting card &#39;</span> <span class="o">+</span> <span class="n">znewcardName</span>
+            <span class="n">hresult</span> <span class="o">=</span> <span class="n">SCardForgetCardType</span><span class="p">(</span><span class="n">hcontext</span><span class="p">,</span> <span class="n">znewcardName</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                    <span class="s">&#39;Failed to remove card type: &#39;</span> <span class="o">+</span> \
+                    <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">hresult2</span> <span class="o">=</span> <span class="n">SCardReleaseContext</span><span class="p">(</span><span class="n">hcontext</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">hresult2</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                    <span class="s">&#39;Failed to release context: &#39;</span> <span class="o">+</span> \
+                    <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+            <span class="k">print</span> <span class="s">&#39;Released context.&#39;</span>
+
+    <span class="k">except</span> <span class="n">error</span><span class="p">:</span>
+        <span class="kn">import</span> <span class="nn">sys</span>
+        <span class="k">print</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span> <span class="s">&#39;:&#39;</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="k">elif</span> <span class="s">&#39;pcsclite&#39;</span> <span class="o">==</span> <span class="n">resourceManager</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s">&#39;SCardListInterfaces not supported by pcsc lite&#39;</span>
+
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="k">if</span> <span class="s">&#39;win32&#39;</span> <span class="o">==</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s">&#39;press Enter to continue&#39;</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="locate-cards-in-the-system">
+<h2>locate cards in the system<a class="headerlink" href="#locate-cards-in-the-system" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#! /usr/bin/env python</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Sample for python PCSC wrapper module: Locate cards in the system</span>
+
+<span class="sd">__author__ = &quot;http://www.gemalto.com&quot;</span>
+
+<span class="sd">Copyright 2001-2012 gemalto</span>
+<span class="sd">Author: Jean-Daniel Aussel, mailto:jean-daniel.aussel@gemalto.com</span>
+<span class="sd">Copyright 2010 Ludovic Rousseau</span>
+<span class="sd">Author: Ludovic Rousseau, mailto:ludovic.rousseau@free.fr</span>
+
+<span class="sd">This file is part of pyscard.</span>
+
+<span class="sd">pyscard is free software; you can redistribute it and/or modify</span>
+<span class="sd">it under the terms of the GNU Lesser General Public License as published by</span>
+<span class="sd">the Free Software Foundation; either version 2.1 of the License, or</span>
+<span class="sd">(at your option) any later version.</span>
+
+<span class="sd">pyscard is distributed in the hope that it will be useful,</span>
+<span class="sd">but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="sd">MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="sd">GNU Lesser General Public License for more details.</span>
+
+<span class="sd">You should have received a copy of the GNU Lesser General Public License</span>
+<span class="sd">along with pyscard; if not, write to the Free Software</span>
+<span class="sd">Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">smartcard.scard</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="k">if</span> <span class="s">&#39;winscard&#39;</span> <span class="o">==</span> <span class="n">resourceManager</span><span class="p">:</span>
+
+    <span class="n">znewcardName</span> <span class="o">=</span> <span class="s">&#39;dummy-card&#39;</span>
+    <span class="n">znewcardATR</span> <span class="o">=</span> \
+      <span class="p">[</span><span class="mh">0x3B</span><span class="p">,</span> <span class="mh">0x77</span><span class="p">,</span> <span class="mh">0x94</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x82</span><span class="p">,</span> <span class="mh">0x30</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x13</span><span class="p">,</span> <span class="mh">0x6C</span><span class="p">,</span> <span class="mh">0x9F</span><span class="p">,</span> <span class="mh">0x22</span><span class="p">]</span>
+    <span class="n">znewcardMask</span> <span class="o">=</span> \
+      <span class="p">[</span><span class="mh">0xFF</span><span class="p">,</span> <span class="mh">0xFF</span><span class="p">,</span> <span class="mh">0xFF</span><span class="p">,</span> <span class="mh">0xFF</span><span class="p">,</span> <span class="mh">0xFF</span><span class="p">,</span> <span class="mh">0xFF</span><span class="p">,</span> <span class="mh">0xFF</span><span class="p">,</span> <span class="mh">0xFF</span><span class="p">,</span> <span class="mh">0xFF</span><span class="p">,</span> <span class="mh">0xFF</span><span class="p">,</span> <span class="mh">0xFF</span><span class="p">,</span> <span class="mh">0xFF</span><span class="p">]</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">hresult</span><span class="p">,</span> <span class="n">hcontext</span> <span class="o">=</span> <span class="n">SCardEstablishContext</span><span class="p">(</span><span class="n">SCARD_SCOPE_USER</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">scard</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                <span class="s">&#39;Failed to establish context: &#39;</span> <span class="o">+</span> \
+                <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+        <span class="k">print</span> <span class="s">&#39;Context established!&#39;</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">hresult</span><span class="p">,</span> <span class="n">readers</span> <span class="o">=</span> <span class="n">SCardListReaders</span><span class="p">(</span><span class="n">hcontext</span><span class="p">,</span> <span class="p">[])</span>
+            <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">scard</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                    <span class="s">&#39;Failed to list readers: &#39;</span> <span class="o">+</span> \
+                    <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+            <span class="k">print</span> <span class="s">&#39;PCSC Readers:&#39;</span><span class="p">,</span> <span class="n">readers</span>
+
+            <span class="c"># introduce a card (forget first in case it is already present)</span>
+            <span class="n">hresult</span> <span class="o">=</span> <span class="n">SCardForgetCardType</span><span class="p">(</span><span class="n">hcontext</span><span class="p">,</span> <span class="n">znewcardName</span><span class="p">)</span>
+            <span class="k">print</span> <span class="s">&#39;Introducing card &#39;</span> <span class="o">+</span> <span class="n">znewcardName</span>
+            <span class="n">hresult</span> <span class="o">=</span> <span class="n">SCardIntroduceCardType</span><span class="p">(</span><span class="n">hcontext</span><span class="p">,</span> <span class="n">znewcardName</span><span class="p">,</span> <span class="p">[],</span>
+                <span class="p">[],</span> <span class="n">znewcardATR</span><span class="p">,</span> <span class="n">znewcardMask</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+                <span class="k">if</span> <span class="n">hresult</span> <span class="o">==</span> <span class="n">ERROR_ALREADY_EXISTS</span><span class="p">:</span>
+                    <span class="k">print</span> <span class="s">&#39;Card already exists&#39;</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                        <span class="s">&#39;Failed to introduce card type: &#39;</span> <span class="o">+</span> \
+                        <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+
+            <span class="n">hresult</span><span class="p">,</span> <span class="n">cards</span> <span class="o">=</span> <span class="n">SCardListCards</span><span class="p">(</span><span class="n">hcontext</span><span class="p">,</span> <span class="p">[],</span> <span class="p">[])</span>
+            <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">error</span><span class="p">(</span><span class="s">&#39;Failure to list cards&#39;</span><span class="p">)</span>
+            <span class="k">print</span> <span class="s">&#39;Cards:&#39;</span><span class="p">,</span> <span class="n">cards</span>
+
+            <span class="n">readerstates</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">readers</span><span class="p">)):</span>
+                <span class="n">readerstates</span> <span class="o">+=</span> <span class="p">[(</span><span class="n">readers</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">SCARD_STATE_UNAWARE</span><span class="p">)]</span>
+            <span class="k">print</span> <span class="n">readerstates</span>
+
+            <span class="n">hresult</span><span class="p">,</span> <span class="n">newstates</span> <span class="o">=</span> <span class="n">SCardLocateCards</span><span class="p">(</span>
+                <span class="n">hcontext</span><span class="p">,</span>
+                <span class="n">cards</span><span class="p">,</span>
+                <span class="n">readerstates</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">newstates</span><span class="p">:</span>
+                <span class="n">reader</span><span class="p">,</span> <span class="n">eventstate</span><span class="p">,</span> <span class="n">atr</span> <span class="o">=</span> <span class="n">i</span>
+                <span class="k">print</span> <span class="n">reader</span><span class="p">,</span>
+                <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">atr</span><span class="p">:</span>
+                    <span class="k">print</span> <span class="s">&quot;0x</span><span class="si">%.2X</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">b</span><span class="p">,</span>
+                <span class="k">print</span> <span class="s">&quot;&quot;</span>
+                <span class="k">if</span> <span class="n">eventstate</span> <span class="o">&amp;</span> <span class="n">SCARD_STATE_ATRMATCH</span><span class="p">:</span>
+                    <span class="k">print</span> <span class="s">&#39;Card found&#39;</span>
+                <span class="k">if</span> <span class="n">eventstate</span> <span class="o">&amp;</span> <span class="n">SCARD_STATE_UNAWARE</span><span class="p">:</span>
+                    <span class="k">print</span> <span class="s">&#39;State unware&#39;</span>
+                <span class="k">if</span> <span class="n">eventstate</span> <span class="o">&amp;</span> <span class="n">SCARD_STATE_IGNORE</span><span class="p">:</span>
+                    <span class="k">print</span> <span class="s">&#39;Ignore reader&#39;</span>
+                <span class="k">if</span> <span class="n">eventstate</span> <span class="o">&amp;</span> <span class="n">SCARD_STATE_UNAVAILABLE</span><span class="p">:</span>
+                    <span class="k">print</span> <span class="s">&#39;Reader unavailable&#39;</span>
+                <span class="k">if</span> <span class="n">eventstate</span> <span class="o">&amp;</span> <span class="n">SCARD_STATE_EMPTY</span><span class="p">:</span>
+                    <span class="k">print</span> <span class="s">&#39;Reader empty&#39;</span>
+                <span class="k">if</span> <span class="n">eventstate</span> <span class="o">&amp;</span> <span class="n">SCARD_STATE_PRESENT</span><span class="p">:</span>
+                    <span class="k">print</span> <span class="s">&#39;Card present in reader&#39;</span>
+                <span class="k">if</span> <span class="n">eventstate</span> <span class="o">&amp;</span> <span class="n">SCARD_STATE_EXCLUSIVE</span><span class="p">:</span>
+                    <span class="k">print</span> <span class="s">&#39;Card allocated for exclusive use&#39;</span>
+                <span class="k">if</span> <span class="n">eventstate</span> <span class="o">&amp;</span> <span class="n">SCARD_STATE_INUSE</span><span class="p">:</span>
+                    <span class="k">print</span> <span class="s">&#39;Card in use but can be shared&#39;</span>
+                <span class="k">if</span> <span class="n">eventstate</span> <span class="o">&amp;</span> <span class="n">SCARD_STATE_MUTE</span><span class="p">:</span>
+                    <span class="k">print</span> <span class="s">&#39;Card is mute&#39;</span>
+                <span class="k">if</span> <span class="n">eventstate</span> <span class="o">&amp;</span> <span class="n">SCARD_STATE_CHANGED</span><span class="p">:</span>
+                    <span class="k">print</span> <span class="s">&#39;State changed&#39;</span>
+                <span class="k">if</span> <span class="n">eventstate</span> <span class="o">&amp;</span> <span class="n">SCARD_STATE_UNKNOWN</span><span class="p">:</span>
+                    <span class="k">print</span> <span class="s">&#39;State unknowned&#39;</span>
+
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">hresult</span> <span class="o">=</span> <span class="n">SCardForgetCardType</span><span class="p">(</span><span class="n">hcontext</span><span class="p">,</span> <span class="n">znewcardName</span><span class="p">)</span>
+            <span class="n">hresult</span> <span class="o">=</span> <span class="n">SCardReleaseContext</span><span class="p">(</span><span class="n">hcontext</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                    <span class="s">&#39;Failed to release context: &#39;</span> <span class="o">+</span> \
+                    <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+            <span class="k">print</span> <span class="s">&#39;Released context.&#39;</span>
+
+    <span class="k">except</span> <span class="n">error</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">print</span> <span class="n">e</span>
+
+<span class="k">elif</span> <span class="s">&#39;pcsclite&#39;</span> <span class="o">==</span> <span class="n">resourceManager</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s">&#39;SCardLocateCards not supported by pcsc lite&#39;</span>
+
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="k">if</span> <span class="s">&#39;win32&#39;</span> <span class="o">==</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s">&#39;press Enter to continue&#39;</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="manage-readers-and-reader-groups">
+<h2>manage readers and reader groups<a class="headerlink" href="#manage-readers-and-reader-groups" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#! /usr/bin/env python</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Sample for python PCSC wrapper module: illustrate reader groups functions</span>
+
+<span class="sd">__author__ = &quot;http://www.gemalto.com&quot;</span>
+
+<span class="sd">Copyright 2001-2012 gemalto</span>
+<span class="sd">Author: Jean-Daniel Aussel, mailto:jean-daniel.aussel@gemalto.com</span>
+<span class="sd">Copyright 2010 Ludovic Rousseau</span>
+<span class="sd">Author: Ludovic Rousseau, mailto:ludovic.rousseau@free.fr</span>
+
+<span class="sd">This file is part of pyscard.</span>
+
+<span class="sd">pyscard is free software; you can redistribute it and/or modify</span>
+<span class="sd">it under the terms of the GNU Lesser General Public License as published by</span>
+<span class="sd">the Free Software Foundation; either version 2.1 of the License, or</span>
+<span class="sd">(at your option) any later version.</span>
+
+<span class="sd">pyscard is distributed in the hope that it will be useful,</span>
+<span class="sd">but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="sd">MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="sd">GNU Lesser General Public License for more details.</span>
+
+<span class="sd">You should have received a copy of the GNU Lesser General Public License</span>
+<span class="sd">along with pyscard; if not, write to the Free Software</span>
+<span class="sd">Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">smartcard.scard</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="n">newgroup</span> <span class="o">=</span> <span class="s">&#39;MyReaderGroup&#39;</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">hresult</span><span class="p">,</span> <span class="n">hcontext</span> <span class="o">=</span> <span class="n">SCardEstablishContext</span><span class="p">(</span><span class="n">SCARD_SCOPE_USER</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+            <span class="s">&#39;Failed to establish context: &#39;</span> <span class="o">+</span> \
+            <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+    <span class="k">print</span> <span class="s">&#39;Context established!&#39;</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">hresult</span><span class="p">,</span> <span class="n">readers</span> <span class="o">=</span> <span class="n">SCardListReaders</span><span class="p">(</span><span class="n">hcontext</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                <span class="s">&#39;Failed to list readers: &#39;</span> <span class="o">+</span> \
+                <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+        <span class="k">print</span> <span class="s">&#39;PCSC Readers in all groups:&#39;</span><span class="p">,</span> <span class="n">readers</span>
+
+        <span class="n">hresult</span><span class="p">,</span> <span class="n">readerGroups</span> <span class="o">=</span> <span class="n">SCardListReaderGroups</span><span class="p">(</span><span class="n">hcontext</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                <span class="s">&#39;Unable to list reader groups: &#39;</span> <span class="o">+</span> \
+                <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+        <span class="k">print</span> <span class="s">&#39;PCSC Reader groups:&#39;</span><span class="p">,</span> <span class="n">readerGroups</span>
+
+        <span class="k">if</span> <span class="s">&#39;winscard&#39;</span> <span class="o">==</span> <span class="n">resourceManager</span><span class="p">:</span>
+
+            <span class="n">hresult</span> <span class="o">=</span> <span class="n">SCardIntroduceReaderGroup</span><span class="p">(</span><span class="n">hcontext</span><span class="p">,</span> <span class="n">newgroup</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                    <span class="s">&#39;Unable to introduce reader group: &#39;</span> <span class="o">+</span> \
+                    <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+
+            <span class="n">dummyreader</span> <span class="o">=</span> <span class="n">readers</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s">&#39; dummy&#39;</span>
+            <span class="n">hresult</span> <span class="o">=</span> <span class="n">SCardIntroduceReader</span><span class="p">(</span><span class="n">hcontext</span><span class="p">,</span> <span class="n">dummyreader</span><span class="p">,</span> <span class="n">readers</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                    <span class="s">&#39;Unable to introduce reader: &#39;</span> <span class="o">+</span> \
+                    <span class="n">dummyreader</span> <span class="o">+</span> <span class="s">&#39; : &#39;</span> <span class="o">+</span> \
+                    <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+
+            <span class="n">hresult</span><span class="p">,</span> <span class="n">readers</span> <span class="o">=</span> <span class="n">SCardListReaders</span><span class="p">(</span><span class="n">hcontext</span><span class="p">,</span> <span class="p">[])</span>
+            <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                    <span class="s">&#39;Failed to list readers: &#39;</span> <span class="o">+</span> \
+                    <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+            <span class="k">print</span> <span class="s">&#39;PCSC Readers in all groups:&#39;</span><span class="p">,</span> <span class="n">readers</span>
+
+            <span class="n">hresult</span> <span class="o">=</span> <span class="n">SCardAddReaderToGroup</span><span class="p">(</span><span class="n">hcontext</span><span class="p">,</span> <span class="n">dummyreader</span><span class="p">,</span> <span class="n">newgroup</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                    <span class="s">&#39;Unable to add reader to group: &#39;</span> <span class="o">+</span> \
+                    <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+
+            <span class="n">hresult</span><span class="p">,</span> <span class="n">readerGroups</span> <span class="o">=</span> <span class="n">SCardListReaderGroups</span><span class="p">(</span><span class="n">hcontext</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                    <span class="s">&#39;Unable to list reader groups: &#39;</span> <span class="o">+</span> \
+                    <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+            <span class="k">print</span> <span class="s">&#39;PCSC Reader groups:&#39;</span><span class="p">,</span> <span class="n">readerGroups</span>
+
+            <span class="n">hresult</span><span class="p">,</span> <span class="n">readers</span> <span class="o">=</span> <span class="n">SCardListReaders</span><span class="p">(</span><span class="n">hcontext</span><span class="p">,</span> <span class="p">[</span><span class="n">newgroup</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                    <span class="s">&#39;Failed to list readers in group &#39;</span> <span class="o">+</span> \
+                    <span class="n">newgroup</span> <span class="o">+</span> <span class="s">&#39; : &#39;</span> <span class="o">+</span> \
+                    <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+            <span class="k">print</span> <span class="s">&#39;PCSC Readers in reader group&#39;</span><span class="p">,</span> <span class="n">newgroup</span><span class="p">,</span> <span class="s">&#39;:&#39;</span><span class="p">,</span> <span class="n">readers</span>
+
+            <span class="n">hresult</span> <span class="o">=</span> <span class="n">SCardRemoveReaderFromGroup</span><span class="p">(</span>
+                <span class="n">hcontext</span><span class="p">,</span>
+                <span class="n">dummyreader</span><span class="p">,</span>
+                <span class="n">newgroup</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                    <span class="s">&#39;Unable to remove reader from group: &#39;</span> <span class="o">+</span> \
+                    <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+
+            <span class="n">hresult</span><span class="p">,</span> <span class="n">readerGroups</span> <span class="o">=</span> <span class="n">SCardListReaderGroups</span><span class="p">(</span><span class="n">hcontext</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                    <span class="s">&#39;Unable to list reader groups: &#39;</span> <span class="o">+</span> \
+                    <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+            <span class="k">print</span> <span class="s">&#39;PCSC Reader groups:&#39;</span><span class="p">,</span> <span class="n">readerGroups</span>
+
+            <span class="n">hresult</span> <span class="o">=</span> <span class="n">SCardForgetReaderGroup</span><span class="p">(</span><span class="n">hcontext</span><span class="p">,</span> <span class="n">newgroup</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                    <span class="s">&#39;Unable to forget reader group: &#39;</span> <span class="o">+</span> \
+                    <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+
+            <span class="n">hresult</span> <span class="o">=</span> <span class="n">SCardForgetReader</span><span class="p">(</span><span class="n">hcontext</span><span class="p">,</span> <span class="n">dummyreader</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                    <span class="s">&#39;Failed to forget readers &#39;</span> <span class="o">+</span> \
+                    <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+
+            <span class="n">hresult</span><span class="p">,</span> <span class="n">readers</span> <span class="o">=</span> <span class="n">SCardListReaders</span><span class="p">(</span><span class="n">hcontext</span><span class="p">,</span> <span class="p">[])</span>
+            <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                    <span class="s">&#39;Failed to list readers: &#39;</span> <span class="o">+</span> \
+                    <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+            <span class="k">print</span> <span class="s">&#39;PCSC Readers in all groups:&#39;</span><span class="p">,</span> <span class="n">readers</span>
+
+        <span class="k">elif</span> <span class="s">&#39;pcsclite&#39;</span> <span class="o">==</span> <span class="n">resourceManager</span><span class="p">:</span>
+            <span class="n">hresult</span><span class="p">,</span> <span class="n">readers</span> <span class="o">=</span> <span class="n">SCardListReaders</span><span class="p">(</span><span class="n">hcontext</span><span class="p">,</span> <span class="n">readerGroups</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                    <span class="s">&#39;Failed to list readers in groups &#39;</span> <span class="o">+</span> \
+                    <span class="nb">repr</span><span class="p">(</span><span class="n">readerGroups</span><span class="p">)</span> <span class="o">+</span> <span class="s">&#39; : &#39;</span> <span class="o">+</span> \
+                    <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+            <span class="k">print</span> <span class="s">&#39;PCSC Readers in reader group&#39;</span><span class="p">,</span> <span class="n">readerGroups</span><span class="p">,</span> <span class="s">&#39;:&#39;</span><span class="p">,</span> <span class="n">readers</span>
+
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">hresult</span> <span class="o">=</span> <span class="n">SCardReleaseContext</span><span class="p">(</span><span class="n">hcontext</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                <span class="s">&#39;Failed to release context: &#39;</span> <span class="o">+</span> \
+                <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+        <span class="k">print</span> <span class="s">&#39;Released context.&#39;</span>
+
+    <span class="kn">import</span> <span class="nn">sys</span>
+    <span class="k">if</span> <span class="s">&#39;win32&#39;</span> <span class="o">==</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&#39;press Enter to continue&#39;</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="k">except</span> <span class="n">error</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+    <span class="k">print</span> <span class="n">e</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="list-smart-card-readers">
+<h2>list smart card readers<a class="headerlink" href="#list-smart-card-readers" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#! /usr/bin/env python</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Sample for python PCSC wrapper module: List PCSC readers</span>
+
+<span class="sd">__author__ = &quot;http://www.gemalto.com&quot;</span>
+
+<span class="sd">Copyright 2001-2012 gemalto</span>
+<span class="sd">Author: Jean-Daniel Aussel, mailto:jean-daniel.aussel@gemalto.com</span>
+<span class="sd">Copyright 2010 Ludovic Rousseau</span>
+<span class="sd">Author: Ludovic Rousseau, mailto:ludovic.rousseau@free.fr</span>
+
+<span class="sd">This file is part of pyscard.</span>
+
+<span class="sd">pyscard is free software; you can redistribute it and/or modify</span>
+<span class="sd">it under the terms of the GNU Lesser General Public License as published by</span>
+<span class="sd">the Free Software Foundation; either version 2.1 of the License, or</span>
+<span class="sd">(at your option) any later version.</span>
+
+<span class="sd">pyscard is distributed in the hope that it will be useful,</span>
+<span class="sd">but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="sd">MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="sd">GNU Lesser General Public License for more details.</span>
+
+<span class="sd">You should have received a copy of the GNU Lesser General Public License</span>
+<span class="sd">along with pyscard; if not, write to the Free Software</span>
+<span class="sd">Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">smartcard.scard</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">hresult</span><span class="p">,</span> <span class="n">hcontext</span> <span class="o">=</span> <span class="n">SCardEstablishContext</span><span class="p">(</span><span class="n">SCARD_SCOPE_USER</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+            <span class="s">&#39;Failed to establish context: &#39;</span> <span class="o">+</span> \
+            <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+    <span class="k">print</span> <span class="s">&#39;Context established!&#39;</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">hresult</span><span class="p">,</span> <span class="n">readers</span> <span class="o">=</span> <span class="n">SCardListReaders</span><span class="p">(</span><span class="n">hcontext</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                <span class="s">&#39;Failed to list readers: &#39;</span> <span class="o">+</span> \
+                <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+        <span class="k">print</span> <span class="s">&#39;PCSC Readers:&#39;</span><span class="p">,</span> <span class="n">readers</span>
+
+        <span class="n">hresult</span><span class="p">,</span> <span class="n">readerGroups</span> <span class="o">=</span> <span class="n">SCardListReaderGroups</span><span class="p">(</span><span class="n">hcontext</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                <span class="s">&#39;Unable to list reader groups: &#39;</span> <span class="o">+</span> \
+                <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+        <span class="k">print</span> <span class="s">&#39;PCSC Reader groups:&#39;</span><span class="p">,</span> <span class="n">readerGroups</span>
+
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">hresult</span> <span class="o">=</span> <span class="n">SCardReleaseContext</span><span class="p">(</span><span class="n">hcontext</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                <span class="s">&#39;Failed to release context: &#39;</span> <span class="o">+</span> \
+                <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+        <span class="k">print</span> <span class="s">&#39;Released context.&#39;</span>
+
+    <span class="kn">import</span> <span class="nn">sys</span>
+    <span class="k">if</span> <span class="s">&#39;win32&#39;</span> <span class="o">==</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&#39;press Enter to continue&#39;</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="k">except</span> <span class="n">error</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+    <span class="k">print</span> <span class="n">e</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="select-the-df-telecom-of-a-sim-card">
+<h2>select the DF_TELECOM of a SIM card<a class="headerlink" href="#select-the-df-telecom-of-a-sim-card" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#! /usr/bin/env python</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Sample for python PCSC wrapper module: Select DF_TELECOM on a SIM card</span>
+
+<span class="sd">__author__ = &quot;http://www.gemalto.com&quot;</span>
+
+<span class="sd">Copyright 2001-2012 gemalto</span>
+<span class="sd">Author: Jean-Daniel Aussel, mailto:jean-daniel.aussel@gemalto.com</span>
+<span class="sd">Copyright 2010 Ludovic Rousseau</span>
+<span class="sd">Author: Ludovic Rousseau, mailto:ludovic.rousseau@free.fr</span>
+
+<span class="sd">This file is part of pyscard.</span>
+
+<span class="sd">pyscard is free software; you can redistribute it and/or modify</span>
+<span class="sd">it under the terms of the GNU Lesser General Public License as published by</span>
+<span class="sd">the Free Software Foundation; either version 2.1 of the License, or</span>
+<span class="sd">(at your option) any later version.</span>
+
+<span class="sd">pyscard is distributed in the hope that it will be useful,</span>
+<span class="sd">but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="sd">MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="sd">GNU Lesser General Public License for more details.</span>
+
+<span class="sd">You should have received a copy of the GNU Lesser General Public License</span>
+<span class="sd">along with pyscard; if not, write to the Free Software</span>
+<span class="sd">Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">smartcard.scard</span> <span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span> <span class="nn">smartcard.util</span>
+
+<span class="n">SELECT</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0xA0</span><span class="p">,</span> <span class="mh">0xA4</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x02</span><span class="p">]</span>
+<span class="n">DF_TELECOM</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x7F</span><span class="p">,</span> <span class="mh">0x10</span><span class="p">]</span>
+<span class="n">GET_RESPONSE</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0xA0</span><span class="p">,</span> <span class="mh">0xC0</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">]</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">hresult</span><span class="p">,</span> <span class="n">hcontext</span> <span class="o">=</span> <span class="n">SCardEstablishContext</span><span class="p">(</span><span class="n">SCARD_SCOPE_USER</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+            <span class="s">&#39;Failed to establish context : &#39;</span> <span class="o">+</span> \
+            <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+    <span class="k">print</span> <span class="s">&#39;Context established!&#39;</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">hresult</span><span class="p">,</span> <span class="n">readers</span> <span class="o">=</span> <span class="n">SCardListReaders</span><span class="p">(</span><span class="n">hcontext</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                <span class="s">&#39;Failed to list readers: &#39;</span> <span class="o">+</span> \
+                <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+        <span class="k">print</span> <span class="s">&#39;PCSC Readers:&#39;</span><span class="p">,</span> <span class="n">readers</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">readers</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">error</span><span class="p">(</span><span class="s">&#39;No smart card readers&#39;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">zreader</span> <span class="ow">in</span> <span class="n">readers</span><span class="p">:</span>
+
+            <span class="k">print</span> <span class="s">&#39;Trying to select DF_TELECOM of card in&#39;</span><span class="p">,</span> <span class="n">zreader</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">hresult</span><span class="p">,</span> <span class="n">hcard</span><span class="p">,</span> <span class="n">dwActiveProtocol</span> <span class="o">=</span> <span class="n">SCardConnect</span><span class="p">(</span>
+                    <span class="n">hcontext</span><span class="p">,</span>
+                    <span class="n">zreader</span><span class="p">,</span>
+                    <span class="n">SCARD_SHARE_SHARED</span><span class="p">,</span> <span class="n">SCARD_PROTOCOL_T0</span> <span class="o">|</span> <span class="n">SCARD_PROTOCOL_T1</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                        <span class="s">&#39;Unable to connect: &#39;</span> <span class="o">+</span> \
+                        <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+                <span class="k">print</span> <span class="s">&#39;Connected with active protocol&#39;</span><span class="p">,</span> <span class="n">dwActiveProtocol</span>
+
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">hresult</span><span class="p">,</span> <span class="n">response</span> <span class="o">=</span> <span class="n">SCardTransmit</span><span class="p">(</span>
+                        <span class="n">hcard</span><span class="p">,</span> <span class="n">dwActiveProtocol</span><span class="p">,</span> <span class="n">SELECT</span> <span class="o">+</span> <span class="n">DF_TELECOM</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                            <span class="s">&#39;Failed to transmit: &#39;</span> <span class="o">+</span> \
+                            <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+                    <span class="k">print</span> <span class="s">&#39;Selected DF_TELECOM: &#39;</span> <span class="o">+</span> \
+                            <span class="n">smartcard</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">toHexString</span><span class="p">(</span>
+                                <span class="n">response</span><span class="p">,</span> <span class="n">smartcard</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">HEX</span><span class="p">)</span>
+                    <span class="n">hresult</span><span class="p">,</span> <span class="n">response</span> <span class="o">=</span> <span class="n">SCardTransmit</span><span class="p">(</span>
+                        <span class="n">hcard</span><span class="p">,</span>
+                        <span class="n">dwActiveProtocol</span><span class="p">,</span>
+                        <span class="n">GET_RESPONSE</span> <span class="o">+</span> <span class="p">[</span><span class="n">response</span><span class="p">[</span><span class="mi">1</span><span class="p">]])</span>
+                    <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                            <span class="s">&#39;Failed to transmit: &#39;</span> <span class="o">+</span> \
+                            <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+                    <span class="k">print</span> <span class="s">&#39;GET_RESPONSE after SELECT DF_TELECOM: &#39;</span> <span class="o">+</span> \
+                            <span class="n">smartcard</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">toHexString</span><span class="p">(</span>
+                                <span class="n">response</span><span class="p">,</span> <span class="n">smartcard</span><span class="o">.</span><span class="n">util</span><span class="o">.</span><span class="n">HEX</span><span class="p">)</span>
+                <span class="k">finally</span><span class="p">:</span>
+                    <span class="n">hresult</span> <span class="o">=</span> <span class="n">SCardDisconnect</span><span class="p">(</span><span class="n">hcard</span><span class="p">,</span> <span class="n">SCARD_UNPOWER_CARD</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                            <span class="s">&#39;Failed to disconnect: &#39;</span> <span class="o">+</span> \
+                            <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+                    <span class="k">print</span> <span class="s">&#39;Disconnected&#39;</span>
+
+            <span class="k">except</span> <span class="n">error</span><span class="p">,</span> <span class="p">(</span><span class="n">message</span><span class="p">):</span>
+                <span class="k">print</span> <span class="n">error</span><span class="p">,</span> <span class="n">message</span>
+
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">hresult</span> <span class="o">=</span> <span class="n">SCardReleaseContext</span><span class="p">(</span><span class="n">hcontext</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                <span class="s">&#39;Failed to release context: &#39;</span> <span class="o">+</span> \
+                <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+        <span class="k">print</span> <span class="s">&#39;Released context.&#39;</span>
+
+<span class="k">except</span> <span class="n">error</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+    <span class="k">print</span> <span class="n">e</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="k">if</span> <span class="s">&#39;win32&#39;</span> <span class="o">==</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s">&#39;press Enter to continue&#39;</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="perform-a-simple-smart-card-transaction">
+<h2>perform a simple smart card transaction<a class="headerlink" href="#perform-a-simple-smart-card-transaction" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#! /usr/bin/env python</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Sample for python PCSC wrapper module: perform a simple transaction</span>
+
+<span class="sd">__author__ = &quot;http://www.gemalto.com&quot;</span>
+
+<span class="sd">Copyright 2001-2012 gemalto</span>
+<span class="sd">Author: Jean-Daniel Aussel, mailto:jean-daniel.aussel@gemalto.com</span>
+<span class="sd">Copyright 2010 Ludovic Rousseau</span>
+<span class="sd">Author: Ludovic Rousseau, mailto:ludovic.rousseau@free.fr</span>
+
+<span class="sd">This file is part of pyscard.</span>
+
+<span class="sd">pyscard is free software; you can redistribute it and/or modify</span>
+<span class="sd">it under the terms of the GNU Lesser General Public License as published by</span>
+<span class="sd">the Free Software Foundation; either version 2.1 of the License, or</span>
+<span class="sd">(at your option) any later version.</span>
+
+<span class="sd">pyscard is distributed in the hope that it will be useful,</span>
+<span class="sd">but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="sd">MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="sd">GNU Lesser General Public License for more details.</span>
+
+<span class="sd">You should have received a copy of the GNU Lesser General Public License</span>
+<span class="sd">along with pyscard; if not, write to the Free Software</span>
+<span class="sd">Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">smartcard.scard</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">hresult</span><span class="p">,</span> <span class="n">hcontext</span> <span class="o">=</span> <span class="n">SCardEstablishContext</span><span class="p">(</span><span class="n">SCARD_SCOPE_USER</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+            <span class="s">&#39;Failed to establish context: &#39;</span> <span class="o">+</span> \
+            <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+    <span class="k">print</span> <span class="s">&#39;Context established!&#39;</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">hresult</span><span class="p">,</span> <span class="n">readers</span> <span class="o">=</span> <span class="n">SCardListReaders</span><span class="p">(</span><span class="n">hcontext</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                <span class="s">&#39;Failed to list readers:: &#39;</span> <span class="o">+</span> \
+                <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+        <span class="k">print</span> <span class="s">&#39;PCSC Readers:&#39;</span><span class="p">,</span> <span class="n">readers</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">readers</span><span class="p">)</span> <span class="o">&lt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">error</span><span class="p">(</span><span class="s">&#39;No smart card readers&#39;</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">zreader</span> <span class="ow">in</span> <span class="n">readers</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&#39;Trying to perform transaction on card in&#39;</span><span class="p">,</span> <span class="n">zreader</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">hresult</span><span class="p">,</span> <span class="n">hcard</span><span class="p">,</span> <span class="n">dwActiveProtocol</span> <span class="o">=</span> <span class="n">SCardConnect</span><span class="p">(</span>
+                    <span class="n">hcontext</span><span class="p">,</span>
+                    <span class="n">zreader</span><span class="p">,</span>
+                    <span class="n">SCARD_SHARE_SHARED</span><span class="p">,</span>
+                    <span class="n">SCARD_PROTOCOL_T0</span> <span class="o">|</span> <span class="n">SCARD_PROTOCOL_T1</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                        <span class="s">&#39;unable to connect: &#39;</span> <span class="o">+</span> \
+                        <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+                <span class="k">print</span> <span class="s">&#39;Connected with active protocol&#39;</span><span class="p">,</span> <span class="n">dwActiveProtocol</span>
+
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">hresult</span> <span class="o">=</span> <span class="n">SCardBeginTransaction</span><span class="p">(</span><span class="n">hcard</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                            <span class="s">&#39;failed to begin transaction: &#39;</span> <span class="o">+</span> \
+                            <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+                    <span class="k">print</span> <span class="s">&#39;Beginning transaction&#39;</span>
+
+                    <span class="n">hresult</span><span class="p">,</span> <span class="n">reader</span><span class="p">,</span> <span class="n">state</span><span class="p">,</span> <span class="n">protocol</span><span class="p">,</span> <span class="n">atr</span> <span class="o">=</span> <span class="n">SCardStatus</span><span class="p">(</span><span class="n">hcard</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                            <span class="s">&#39;failed to get status: &#39;</span> <span class="o">+</span> \
+                            <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+                    <span class="k">print</span> <span class="s">&#39;ATR:&#39;</span><span class="p">,</span>
+                    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">xrange</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">atr</span><span class="p">)):</span>
+                        <span class="k">print</span> <span class="s">&quot;0x</span><span class="si">%.2X</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">atr</span><span class="p">[</span><span class="n">i</span><span class="p">],</span>
+                    <span class="k">print</span> <span class="s">&quot;&quot;</span>
+
+                <span class="k">finally</span><span class="p">:</span>
+                    <span class="n">hresult</span> <span class="o">=</span> <span class="n">SCardEndTransaction</span><span class="p">(</span><span class="n">hcard</span><span class="p">,</span> <span class="n">SCARD_LEAVE_CARD</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                            <span class="s">&#39;failed to end transaction: &#39;</span> <span class="o">+</span> \
+                            <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+                    <span class="k">print</span> <span class="s">&#39;Transaction ended&#39;</span>
+
+                    <span class="n">hresult</span> <span class="o">=</span> <span class="n">SCardDisconnect</span><span class="p">(</span><span class="n">hcard</span><span class="p">,</span> <span class="n">SCARD_UNPOWER_CARD</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                            <span class="s">&#39;failed to disconnect: &#39;</span> <span class="o">+</span> \
+                            <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+                    <span class="k">print</span> <span class="s">&#39;Disconnected&#39;</span>
+            <span class="k">except</span> <span class="n">error</span><span class="p">,</span> <span class="p">(</span><span class="n">message</span><span class="p">):</span>
+                <span class="k">print</span> <span class="n">error</span><span class="p">,</span> <span class="n">message</span>
+
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">hresult</span> <span class="o">=</span> <span class="n">SCardReleaseContext</span><span class="p">(</span><span class="n">hcontext</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">hresult</span> <span class="o">!=</span> <span class="n">SCARD_S_SUCCESS</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">error</span><span class="p">(</span>
+                <span class="s">&#39;failed to release context: &#39;</span> <span class="o">+</span> \
+                <span class="n">SCardGetErrorMessage</span><span class="p">(</span><span class="n">hresult</span><span class="p">))</span>
+        <span class="k">print</span> <span class="s">&#39;Released context.&#39;</span>
+
+<span class="k">except</span> <span class="n">error</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+    <span class="k">print</span> <span class="n">e</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="k">if</span> <span class="s">&#39;win32&#39;</span> <span class="o">==</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s">&#39;press Enter to continue&#39;</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">PCSC wrapper samples</a><ul>
+<li><a class="reference internal" href="#send-a-control-code-to-a-card-or-reader">send a Control Code to a card or reader</a></li>
+<li><a class="reference internal" href="#get-the-atr-of-a-card">get the ATR of a card</a></li>
+<li><a class="reference internal" href="#get-the-attributes-of-a-card">get the attributes of a card</a></li>
+<li><a class="reference internal" href="#wait-for-card-insertion-removal">wait for card insertion/removal</a></li>
+<li><a class="reference internal" href="#list-the-cards-introduced-in-the-system">list the cards introduced in the system</a></li>
+<li><a class="reference internal" href="#list-the-interfaces-supported-by-a-card">list the interfaces supported by a card</a></li>
+<li><a class="reference internal" href="#locate-cards-in-the-system">locate cards in the system</a></li>
+<li><a class="reference internal" href="#manage-readers-and-reader-groups">manage readers and reader groups</a></li>
+<li><a class="reference internal" href="#list-smart-card-readers">list smart card readers</a></li>
+<li><a class="reference internal" href="#select-the-df-telecom-of-a-sim-card">select the DF_TELECOM of a SIM card</a></li>
+<li><a class="reference internal" href="#perform-a-simple-smart-card-transaction">perform a simple smart card transaction</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="pyscard-framework.html"
+                        title="previous chapter">pyscard smartcard framework samples</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="license.html"
+                        title="next chapter">License</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/pyscard-wrapper.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="license.html" title="License"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="pyscard-framework.html" title="pyscard smartcard framework samples"
+             >previous</a> |</li>
+        <li><a href="index.html">pyscard 1.6.16 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Jean-Daniel Aussel, Ludovic Rousseau.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,993 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyscard smartcard framework samples &mdash; pyscard 1.6.16 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.6.16',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="pyscard 1.6.16 documentation" href="index.html" />
+    <link rel="next" title="PCSC wrapper samples" href="pyscard-wrapper.html" />
+    <link rel="prev" title="pyscard user’s guide" href="user-guide.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="pyscard-wrapper.html" title="PCSC wrapper samples"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="user-guide.html" title="pyscard user’s guide"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">pyscard 1.6.16 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="pyscard-smartcard-framework-samples">
+<span id="framework-samples"></span><h1>pyscard smartcard framework samples<a class="headerlink" href="#pyscard-smartcard-framework-samples" title="Permalink to this headline">¶</a></h1>
+<p>pyscard is a python module adding smart cards support to python.</p>
+<p>It consists of smartcard.scard, an extension module wrapping Windows
+smart card base components (also known as PCSC), and smartcard, a python
+framework library hiding PCSC complexity.</p>
+<div class="section" id="display-the-atr-of-inserted-cards">
+<h2>Display the ATR of inserted cards<a class="headerlink" href="#display-the-atr-of-inserted-cards" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#! /usr/bin/env python</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Sample script that displays the ATR of inserted cards.</span>
+
+<span class="sd">__author__ = &quot;http://www.gemalto.com&quot;</span>
+
+<span class="sd">Copyright 2001-2012 gemalto</span>
+<span class="sd">Author: Jean-Daniel Aussel, mailto:jean-daniel.aussel@gemalto.com</span>
+<span class="sd">Copyright 2010 Ludovic Rousseau</span>
+<span class="sd">Author: Ludovic Rousseau, mailto:ludovic.rousseau@free.fr</span>
+
+<span class="sd">This file is part of pyscard.</span>
+
+<span class="sd">pyscard is free software; you can redistribute it and/or modify</span>
+<span class="sd">it under the terms of the GNU Lesser General Public License as published by</span>
+<span class="sd">the Free Software Foundation; either version 2.1 of the License, or</span>
+<span class="sd">(at your option) any later version.</span>
+
+<span class="sd">pyscard is distributed in the hope that it will be useful,</span>
+<span class="sd">but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="sd">MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="sd">GNU Lesser General Public License for more details.</span>
+
+<span class="sd">You should have received a copy of the GNU Lesser General Public License</span>
+<span class="sd">along with pyscard; if not, write to the Free Software</span>
+<span class="sd">Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">smartcard.Exceptions</span> <span class="kn">import</span> <span class="n">NoCardException</span>
+<span class="kn">from</span> <span class="nn">smartcard.System</span> <span class="kn">import</span> <span class="n">readers</span>
+<span class="kn">from</span> <span class="nn">smartcard.util</span> <span class="kn">import</span> <span class="n">toHexString</span>
+
+<span class="k">for</span> <span class="n">reader</span> <span class="ow">in</span> <span class="n">readers</span><span class="p">():</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">connection</span> <span class="o">=</span> <span class="n">reader</span><span class="o">.</span><span class="n">createConnection</span><span class="p">()</span>
+        <span class="n">connection</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+        <span class="k">print</span> <span class="n">reader</span><span class="p">,</span> <span class="n">toHexString</span><span class="p">(</span><span class="n">connection</span><span class="o">.</span><span class="n">getATR</span><span class="p">())</span>
+    <span class="k">except</span> <span class="n">NoCardException</span><span class="p">:</span>
+        <span class="k">print</span> <span class="n">reader</span><span class="p">,</span> <span class="s">&#39;no card inserted&#39;</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="k">if</span> <span class="s">&#39;win32&#39;</span> <span class="o">==</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s">&#39;press Enter to continue&#39;</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="selecting-the-df-telecom-of-a-card">
+<h2>Selecting the DF_TELECOM of a card<a class="headerlink" href="#selecting-the-df-telecom-of-a-card" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#! /usr/bin/env python</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Sample script that tries to select the DF_TELECOM on all inserted cards.</span>
+
+<span class="sd">__author__ = &quot;http://www.gemalto.com&quot;</span>
+
+<span class="sd">Copyright 2001-2012 gemalto</span>
+<span class="sd">Author: Jean-Daniel Aussel, mailto:jean-daniel.aussel@gemalto.com</span>
+<span class="sd">Copyright 2010 Ludovic Rousseau</span>
+<span class="sd">Author: Ludovic Rousseau, mailto:ludovic.rousseau@free.fr</span>
+
+<span class="sd">This file is part of pyscard.</span>
+
+<span class="sd">pyscard is free software; you can redistribute it and/or modify</span>
+<span class="sd">it under the terms of the GNU Lesser General Public License as published by</span>
+<span class="sd">the Free Software Foundation; either version 2.1 of the License, or</span>
+<span class="sd">(at your option) any later version.</span>
+
+<span class="sd">pyscard is distributed in the hope that it will be useful,</span>
+<span class="sd">but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="sd">MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="sd">GNU Lesser General Public License for more details.</span>
+
+<span class="sd">You should have received a copy of the GNU Lesser General Public License</span>
+<span class="sd">along with pyscard; if not, write to the Free Software</span>
+<span class="sd">Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">smartcard.CardType</span> <span class="kn">import</span> <span class="n">AnyCardType</span>
+<span class="kn">from</span> <span class="nn">smartcard.CardRequest</span> <span class="kn">import</span> <span class="n">CardRequest</span>
+<span class="kn">from</span> <span class="nn">smartcard.CardConnectionObserver</span> <span class="kn">import</span> <span class="n">ConsoleCardConnectionObserver</span>
+<span class="kn">from</span> <span class="nn">smartcard.Exceptions</span> <span class="kn">import</span> <span class="n">CardRequestTimeoutException</span>
+
+<span class="c"># define the apdus used in this script</span>
+<span class="n">GET_RESPONSE</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0XA0</span><span class="p">,</span> <span class="mh">0XC0</span><span class="p">,</span> <span class="mo">00</span><span class="p">,</span> <span class="mo">00</span><span class="p">]</span>
+<span class="n">SELECT</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0xA0</span><span class="p">,</span> <span class="mh">0xA4</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x02</span><span class="p">]</span>
+<span class="n">DF_TELECOM</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x7F</span><span class="p">,</span> <span class="mh">0x10</span><span class="p">]</span>
+
+<span class="c"># request any card type</span>
+<span class="n">cardtype</span> <span class="o">=</span> <span class="n">AnyCardType</span><span class="p">()</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="c"># request card insertion</span>
+    <span class="k">print</span> <span class="s">&#39;insert a card (SIM card if possible) within 10s&#39;</span>
+    <span class="n">cardrequest</span> <span class="o">=</span> <span class="n">CardRequest</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">cardType</span><span class="o">=</span><span class="n">cardtype</span><span class="p">)</span>
+    <span class="n">cardservice</span> <span class="o">=</span> <span class="n">cardrequest</span><span class="o">.</span><span class="n">waitforcard</span><span class="p">()</span>
+
+    <span class="c"># attach the console tracer</span>
+    <span class="n">observer</span> <span class="o">=</span> <span class="n">ConsoleCardConnectionObserver</span><span class="p">()</span>
+    <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">addObserver</span><span class="p">(</span><span class="n">observer</span><span class="p">)</span>
+
+    <span class="c"># connect to the card and perform a few transmits</span>
+    <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+
+    <span class="n">apdu</span> <span class="o">=</span> <span class="n">SELECT</span> <span class="o">+</span> <span class="n">DF_TELECOM</span>
+    <span class="n">response</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span> <span class="o">=</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">transmit</span><span class="p">(</span><span class="n">apdu</span><span class="p">)</span>
+
+    <span class="c"># there is a DF_TELECOM</span>
+    <span class="k">if</span> <span class="n">sw1</span> <span class="o">==</span> <span class="mh">0x9F</span><span class="p">:</span>
+        <span class="n">apdu</span> <span class="o">=</span> <span class="n">GET_RESPONSE</span> <span class="o">+</span> <span class="p">[</span><span class="n">sw2</span><span class="p">]</span>
+        <span class="n">response</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span> <span class="o">=</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">transmit</span><span class="p">(</span><span class="n">apdu</span><span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&#39;no DF_TELECOM&#39;</span>
+
+<span class="k">except</span> <span class="n">CardRequestTimeoutException</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s">&#39;time-out: no card inserted during last 10s&#39;</span>
+
+<span class="k">except</span><span class="p">:</span>
+    <span class="kn">import</span> <span class="nn">sys</span>
+    <span class="k">print</span> <span class="n">sys</span><span class="o">.</span><span class="n">exc_info</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="k">if</span> <span class="s">&#39;win32&#39;</span> <span class="o">==</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s">&#39;press Enter to continue&#39;</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="a-simple-apdu-tracer-and-interpreter">
+<h2>A simple apdu tracer and interpreter<a class="headerlink" href="#a-simple-apdu-tracer-and-interpreter" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#! /usr/bin/env python</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Sample script that defines a custom card connection observer.</span>
+
+<span class="sd">__author__ = &quot;http://www.gemalto.com&quot;</span>
+
+<span class="sd">Copyright 2001-2012 gemalto</span>
+<span class="sd">Author: Jean-Daniel Aussel, mailto:jean-daniel.aussel@gemalto.com</span>
+
+<span class="sd">This file is part of pyscard.</span>
+
+<span class="sd">pyscard is free software; you can redistribute it and/or modify</span>
+<span class="sd">it under the terms of the GNU Lesser General Public License as published by</span>
+<span class="sd">the Free Software Foundation; either version 2.1 of the License, or</span>
+<span class="sd">(at your option) any later version.</span>
+
+<span class="sd">pyscard is distributed in the hope that it will be useful,</span>
+<span class="sd">but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="sd">MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="sd">GNU Lesser General Public License for more details.</span>
+
+<span class="sd">You should have received a copy of the GNU Lesser General Public License</span>
+<span class="sd">along with pyscard; if not, write to the Free Software</span>
+<span class="sd">Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">smartcard.CardType</span> <span class="kn">import</span> <span class="n">AnyCardType</span>
+<span class="kn">from</span> <span class="nn">smartcard.CardRequest</span> <span class="kn">import</span> <span class="n">CardRequest</span>
+<span class="kn">from</span> <span class="nn">smartcard.CardConnectionObserver</span> <span class="kn">import</span> <span class="n">CardConnectionObserver</span>
+<span class="kn">from</span> <span class="nn">smartcard.util</span> <span class="kn">import</span> <span class="n">toHexString</span>
+
+<span class="kn">from</span> <span class="nn">string</span> <span class="kn">import</span> <span class="n">replace</span>
+
+
+<span class="k">class</span> <span class="nc">TracerAndSELECTInterpreter</span><span class="p">(</span><span class="n">CardConnectionObserver</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This observer will interprer SELECT and GET RESPONSE bytes</span>
+<span class="sd">    and replace them with a human readable string.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cardconnection</span><span class="p">,</span> <span class="n">ccevent</span><span class="p">):</span>
+
+        <span class="k">if</span> <span class="s">&#39;connect&#39;</span> <span class="o">==</span> <span class="n">ccevent</span><span class="o">.</span><span class="n">type</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&#39;connecting to &#39;</span> <span class="o">+</span> <span class="n">cardconnection</span><span class="o">.</span><span class="n">getReader</span><span class="p">()</span>
+
+        <span class="k">elif</span> <span class="s">&#39;disconnect&#39;</span> <span class="o">==</span> <span class="n">ccevent</span><span class="o">.</span><span class="n">type</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&#39;disconnecting from &#39;</span> <span class="o">+</span> <span class="n">cardconnection</span><span class="o">.</span><span class="n">getReader</span><span class="p">()</span>
+
+        <span class="k">elif</span> <span class="s">&#39;command&#39;</span> <span class="o">==</span> <span class="n">ccevent</span><span class="o">.</span><span class="n">type</span><span class="p">:</span>
+            <span class="nb">str</span> <span class="o">=</span> <span class="n">toHexString</span><span class="p">(</span><span class="n">ccevent</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="nb">str</span> <span class="o">=</span> <span class="n">replace</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="s">&quot;A0 A4 00 00 02&quot;</span><span class="p">,</span> <span class="s">&quot;SELECT&quot;</span><span class="p">)</span>
+            <span class="nb">str</span> <span class="o">=</span> <span class="n">replace</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="s">&quot;A0 C0 00 00&quot;</span><span class="p">,</span> <span class="s">&quot;GET RESPONSE&quot;</span><span class="p">)</span>
+            <span class="k">print</span> <span class="s">&#39;&gt;&#39;</span><span class="p">,</span> <span class="nb">str</span>
+
+        <span class="k">elif</span> <span class="s">&#39;response&#39;</span> <span class="o">==</span> <span class="n">ccevent</span><span class="o">.</span><span class="n">type</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">[]</span> <span class="o">==</span> <span class="n">ccevent</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="k">print</span> <span class="s">&#39;&lt;  []&#39;</span><span class="p">,</span> <span class="s">&quot;</span><span class="si">%-2X</span><span class="s"> </span><span class="si">%-2X</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">ccevent</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">print</span> <span class="s">&#39;&lt;&#39;</span><span class="p">,</span>
+                <span class="n">toHexString</span><span class="p">(</span><span class="n">ccevent</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+                <span class="s">&quot;</span><span class="si">%-2X</span><span class="s"> </span><span class="si">%-2X</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">ccevent</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:])</span>
+
+
+<span class="c"># define the apdus used in this script</span>
+<span class="n">GET_RESPONSE</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0XA0</span><span class="p">,</span> <span class="mh">0XC0</span><span class="p">,</span> <span class="mo">00</span><span class="p">,</span> <span class="mo">00</span><span class="p">]</span>
+<span class="n">SELECT</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0xA0</span><span class="p">,</span> <span class="mh">0xA4</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x02</span><span class="p">]</span>
+<span class="n">DF_TELECOM</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x7F</span><span class="p">,</span> <span class="mh">0x10</span><span class="p">]</span>
+
+
+<span class="c"># we request any type and wait for 10s for card insertion</span>
+<span class="n">cardtype</span> <span class="o">=</span> <span class="n">AnyCardType</span><span class="p">()</span>
+<span class="n">cardrequest</span> <span class="o">=</span> <span class="n">CardRequest</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">cardType</span><span class="o">=</span><span class="n">cardtype</span><span class="p">)</span>
+<span class="n">cardservice</span> <span class="o">=</span> <span class="n">cardrequest</span><span class="o">.</span><span class="n">waitforcard</span><span class="p">()</span>
+
+<span class="c"># create an instance of our observer and attach to the connection</span>
+<span class="n">observer</span> <span class="o">=</span> <span class="n">TracerAndSELECTInterpreter</span><span class="p">()</span>
+<span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">addObserver</span><span class="p">(</span><span class="n">observer</span><span class="p">)</span>
+
+
+<span class="c"># connect and send APDUs</span>
+<span class="c"># the observer will trace on the console</span>
+<span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+
+<span class="n">apdu</span> <span class="o">=</span> <span class="n">SELECT</span> <span class="o">+</span> <span class="n">DF_TELECOM</span>
+<span class="n">response</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span> <span class="o">=</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">transmit</span><span class="p">(</span><span class="n">apdu</span><span class="p">)</span>
+<span class="k">if</span> <span class="n">sw1</span> <span class="o">==</span> <span class="mh">0x9F</span><span class="p">:</span>
+    <span class="n">apdu</span> <span class="o">=</span> <span class="n">GET_RESPONSE</span> <span class="o">+</span> <span class="p">[</span><span class="n">sw2</span><span class="p">]</span>
+    <span class="n">response</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span> <span class="o">=</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">transmit</span><span class="p">(</span><span class="n">apdu</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s">&#39;no DF_TELECOM&#39;</span>
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="k">if</span> <span class="s">&#39;win32&#39;</span> <span class="o">==</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s">&#39;press Enter to continue&#39;</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="tracing-connection-events">
+<h2>Tracing connection events<a class="headerlink" href="#tracing-connection-events" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#! /usr/bin/env python</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Sample script that monitors card connection events.</span>
+
+<span class="sd">__author__ = &quot;http://www.gemalto.com&quot;</span>
+
+<span class="sd">Copyright 2001-2012 gemalto</span>
+<span class="sd">Author: Jean-Daniel Aussel, mailto:jean-daniel.aussel@gemalto.com</span>
+
+<span class="sd">This file is part of pyscard.</span>
+
+<span class="sd">pyscard is free software; you can redistribute it and/or modify</span>
+<span class="sd">it under the terms of the GNU Lesser General Public License as published by</span>
+<span class="sd">the Free Software Foundation; either version 2.1 of the License, or</span>
+<span class="sd">(at your option) any later version.</span>
+
+<span class="sd">pyscard is distributed in the hope that it will be useful,</span>
+<span class="sd">but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="sd">MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="sd">GNU Lesser General Public License for more details.</span>
+
+<span class="sd">You should have received a copy of the GNU Lesser General Public License</span>
+<span class="sd">along with pyscard; if not, write to the Free Software</span>
+<span class="sd">Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">smartcard.CardType</span> <span class="kn">import</span> <span class="n">AnyCardType</span>
+<span class="kn">from</span> <span class="nn">smartcard.CardRequest</span> <span class="kn">import</span> <span class="n">CardRequest</span>
+<span class="kn">from</span> <span class="nn">smartcard.CardConnectionObserver</span> <span class="kn">import</span> <span class="n">ConsoleCardConnectionObserver</span>
+
+<span class="c"># define the apdus used in this script</span>
+<span class="n">GET_RESPONSE</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0XA0</span><span class="p">,</span> <span class="mh">0XC0</span><span class="p">,</span> <span class="mo">00</span><span class="p">,</span> <span class="mo">00</span><span class="p">]</span>
+<span class="n">SELECT</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0xA0</span><span class="p">,</span> <span class="mh">0xA4</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x02</span><span class="p">]</span>
+<span class="n">DF_TELECOM</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x7F</span><span class="p">,</span> <span class="mh">0x10</span><span class="p">]</span>
+
+
+<span class="c"># request any card type</span>
+<span class="n">cardtype</span> <span class="o">=</span> <span class="n">AnyCardType</span><span class="p">()</span>
+<span class="n">cardrequest</span> <span class="o">=</span> <span class="n">CardRequest</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">cardType</span><span class="o">=</span><span class="n">cardtype</span><span class="p">)</span>
+<span class="n">cardservice</span> <span class="o">=</span> <span class="n">cardrequest</span><span class="o">.</span><span class="n">waitforcard</span><span class="p">()</span>
+
+
+<span class="c"># attach the console tracer</span>
+<span class="n">observer</span> <span class="o">=</span> <span class="n">ConsoleCardConnectionObserver</span><span class="p">()</span>
+<span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">addObserver</span><span class="p">(</span><span class="n">observer</span><span class="p">)</span>
+
+
+<span class="c"># connect to the card and perform a few transmits</span>
+<span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+
+<span class="n">apdu</span> <span class="o">=</span> <span class="n">SELECT</span> <span class="o">+</span> <span class="n">DF_TELECOM</span>
+<span class="n">response</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span> <span class="o">=</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">transmit</span><span class="p">(</span><span class="n">apdu</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">sw1</span> <span class="o">==</span> <span class="mh">0x9F</span><span class="p">:</span>
+    <span class="n">apdu</span> <span class="o">=</span> <span class="n">GET_RESPONSE</span> <span class="o">+</span> <span class="p">[</span><span class="n">sw2</span><span class="p">]</span>
+    <span class="n">response</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span> <span class="o">=</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">transmit</span><span class="p">(</span><span class="n">apdu</span><span class="p">)</span>
+
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="k">if</span> <span class="s">&#39;win32&#39;</span> <span class="o">==</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s">&#39;press Enter to continue&#39;</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="decorating-card-connections-to-add-custom-behavior">
+<h2>Decorating Card Connections to add custom behavior<a class="headerlink" href="#decorating-card-connections-to-add-custom-behavior" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#! /usr/bin/env python</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Sample script that illustrates card connection decorators.</span>
+
+<span class="sd">__author__ = &quot;http://www.gemalto.com&quot;</span>
+
+<span class="sd">Copyright 2001-2012 gemalto</span>
+<span class="sd">Author: Jean-Daniel Aussel, mailto:jean-daniel.aussel@gemalto.com</span>
+
+<span class="sd">This file is part of pyscard.</span>
+
+<span class="sd">pyscard is free software; you can redistribute it and/or modify</span>
+<span class="sd">it under the terms of the GNU Lesser General Public License as published by</span>
+<span class="sd">the Free Software Foundation; either version 2.1 of the License, or</span>
+<span class="sd">(at your option) any later version.</span>
+
+<span class="sd">pyscard is distributed in the hope that it will be useful,</span>
+<span class="sd">but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="sd">MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="sd">GNU Lesser General Public License for more details.</span>
+
+<span class="sd">You should have received a copy of the GNU Lesser General Public License</span>
+<span class="sd">along with pyscard; if not, write to the Free Software</span>
+<span class="sd">Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">smartcard.CardType</span> <span class="kn">import</span> <span class="n">AnyCardType</span>
+<span class="kn">from</span> <span class="nn">smartcard.CardRequest</span> <span class="kn">import</span> <span class="n">CardRequest</span>
+<span class="kn">from</span> <span class="nn">smartcard.CardConnectionObserver</span> <span class="kn">import</span> <span class="n">ConsoleCardConnectionObserver</span>
+<span class="kn">from</span> <span class="nn">smartcard.CardConnection</span> <span class="kn">import</span> <span class="n">CardConnection</span>
+<span class="kn">from</span> <span class="nn">smartcard.CardConnectionDecorator</span> <span class="kn">import</span> <span class="n">CardConnectionDecorator</span>
+<span class="kn">from</span> <span class="nn">smartcard.util</span> <span class="kn">import</span> <span class="n">toHexString</span>
+
+<span class="c"># define two custom CardConnectionDecorator</span>
+<span class="c"># the decorators are very simple, just to illustrate</span>
+<span class="c"># shortly how several decorators can be added to the</span>
+<span class="c"># card connection</span>
+
+
+<span class="k">class</span> <span class="nc">SecureChannelConnection</span><span class="p">(</span><span class="n">CardConnectionDecorator</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;This decorator is a mockup of secure channel connection.</span>
+<span class="sd">    It merely pretends to cypher/uncypher upon apdu transmission.&#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cardconnection</span><span class="p">):</span>
+        <span class="n">CardConnectionDecorator</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cardconnection</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">cypher</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Cypher mock-up; you would include the secure channel logics here.&#39;&#39;&#39;</span>
+        <span class="k">print</span> <span class="s">&#39;cyphering&#39;</span><span class="p">,</span> <span class="n">toHexString</span><span class="p">(</span><span class="nb">bytes</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">bytes</span>
+
+    <span class="k">def</span> <span class="nf">uncypher</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Uncypher mock-up;</span>
+<span class="sd">        you would include the secure channel logics here.&#39;&#39;&#39;</span>
+        <span class="k">print</span> <span class="s">&#39;uncyphering&#39;</span><span class="p">,</span> <span class="n">toHexString</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">data</span>
+
+    <span class="k">def</span> <span class="nf">transmit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">protocol</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Cypher/uncypher APDUs before transmission&quot;&quot;&quot;</span>
+        <span class="n">cypheredbytes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cypher</span><span class="p">(</span><span class="nb">bytes</span><span class="p">)</span>
+        <span class="n">data</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span> <span class="o">=</span> <span class="n">CardConnectionDecorator</span><span class="o">.</span><span class="n">transmit</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">cypheredbytes</span><span class="p">,</span> <span class="n">protocol</span><span class="p">)</span>
+        <span class="k">if</span> <span class="p">[]</span> <span class="o">!=</span> <span class="n">data</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">uncypher</span><span class="p">(</span><span class="n">data</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span>
+
+
+<span class="k">class</span> <span class="nc">FakeATRConnection</span><span class="p">(</span><span class="n">CardConnectionDecorator</span><span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;This decorator changes the fist byte of the ATR. This is just an example</span>
+<span class="sd">    to show that decorators can be nested.&#39;&#39;&#39;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cardconnection</span><span class="p">):</span>
+        <span class="n">CardConnectionDecorator</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cardconnection</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">getATR</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Replace first BYTE of ATR by 3F&quot;&quot;&quot;</span>
+        <span class="n">atr</span> <span class="o">=</span> <span class="n">CardConnectionDecorator</span><span class="o">.</span><span class="n">getATR</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="mh">0x3f</span><span class="p">]</span> <span class="o">+</span> <span class="n">atr</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+
+
+<span class="c"># define the apdus used in this script</span>
+<span class="n">GET_RESPONSE</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0XA0</span><span class="p">,</span> <span class="mh">0XC0</span><span class="p">,</span> <span class="mo">00</span><span class="p">,</span> <span class="mo">00</span><span class="p">]</span>
+<span class="n">SELECT</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0xA0</span><span class="p">,</span> <span class="mh">0xA4</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x02</span><span class="p">]</span>
+<span class="n">DF_TELECOM</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x7F</span><span class="p">,</span> <span class="mh">0x10</span><span class="p">]</span>
+
+
+<span class="c"># request any card type</span>
+<span class="n">cardtype</span> <span class="o">=</span> <span class="n">AnyCardType</span><span class="p">()</span>
+<span class="n">cardrequest</span> <span class="o">=</span> <span class="n">CardRequest</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">cardType</span><span class="o">=</span><span class="n">cardtype</span><span class="p">)</span>
+<span class="n">cardservice</span> <span class="o">=</span> <span class="n">cardrequest</span><span class="o">.</span><span class="n">waitforcard</span><span class="p">()</span>
+
+<span class="c"># attach the console tracer</span>
+<span class="n">observer</span> <span class="o">=</span> <span class="n">ConsoleCardConnectionObserver</span><span class="p">()</span>
+<span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">addObserver</span><span class="p">(</span><span class="n">observer</span><span class="p">)</span>
+
+<span class="c"># attach our decorator</span>
+<span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span> <span class="o">=</span> <span class="n">FakeATRConnection</span><span class="p">(</span>
+    <span class="n">SecureChannelConnection</span><span class="p">(</span><span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="p">))</span>
+
+<span class="c"># connect to the card and perform a few transmits</span>
+<span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+
+<span class="k">print</span> <span class="s">&#39;ATR&#39;</span><span class="p">,</span> <span class="n">toHexString</span><span class="p">(</span><span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">getATR</span><span class="p">())</span>
+
+<span class="n">apdu</span> <span class="o">=</span> <span class="n">SELECT</span> <span class="o">+</span> <span class="n">DF_TELECOM</span>
+<span class="n">response</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span> <span class="o">=</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">transmit</span><span class="p">(</span><span class="n">apdu</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">sw1</span> <span class="o">==</span> <span class="mh">0x9F</span><span class="p">:</span>
+    <span class="n">apdu</span> <span class="o">=</span> <span class="n">GET_RESPONSE</span> <span class="o">+</span> <span class="p">[</span><span class="n">sw2</span><span class="p">]</span>
+    <span class="n">response</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span> <span class="o">=</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">transmit</span><span class="p">(</span><span class="n">apdu</span><span class="p">)</span>
+
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="k">if</span> <span class="s">&#39;win32&#39;</span> <span class="o">==</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s">&#39;press Enter to continue&#39;</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="detecting-response-apdu-errors">
+<h2>Detecting response apdu errors<a class="headerlink" href="#detecting-response-apdu-errors" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#! /usr/bin/env python</span>
+<span class="sd">&quot;&quot;&quot;Sample script for APDU error checking.</span>
+
+<span class="sd">__author__ = &quot;http://www.gemalto.com&quot;</span>
+
+<span class="sd">Copyright 2001-2012 gemalto</span>
+<span class="sd">Author: Jean-Daniel Aussel, mailto:jean-daniel.aussel@gemalto.com</span>
+
+<span class="sd">This file is part of pyscard.</span>
+
+<span class="sd">pyscard is free software; you can redistribute it and/or modify</span>
+<span class="sd">it under the terms of the GNU Lesser General Public License as published by</span>
+<span class="sd">the Free Software Foundation; either version 2.1 of the License, or</span>
+<span class="sd">(at your option) any later version.</span>
+
+<span class="sd">pyscard is distributed in the hope that it will be useful,</span>
+<span class="sd">but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="sd">MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="sd">GNU Lesser General Public License for more details.</span>
+
+<span class="sd">You should have received a copy of the GNU Lesser General Public License</span>
+<span class="sd">along with pyscard; if not, write to the Free Software</span>
+<span class="sd">Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="kn">from</span> <span class="nn">smartcard.CardType</span> <span class="kn">import</span> <span class="n">AnyCardType</span>
+<span class="kn">from</span> <span class="nn">smartcard.CardRequest</span> <span class="kn">import</span> <span class="n">CardRequest</span>
+<span class="kn">from</span> <span class="nn">smartcard.CardConnectionObserver</span> <span class="kn">import</span> <span class="n">ConsoleCardConnectionObserver</span>
+
+<span class="kn">from</span> <span class="nn">smartcard.sw.ErrorCheckingChain</span> <span class="kn">import</span> <span class="n">ErrorCheckingChain</span>
+<span class="kn">from</span> <span class="nn">smartcard.sw.ISO7816_4ErrorChecker</span> <span class="kn">import</span> <span class="n">ISO7816_4ErrorChecker</span>
+<span class="kn">from</span> <span class="nn">smartcard.sw.ISO7816_8ErrorChecker</span> <span class="kn">import</span> <span class="n">ISO7816_8ErrorChecker</span>
+<span class="kn">from</span> <span class="nn">smartcard.sw.ISO7816_9ErrorChecker</span> <span class="kn">import</span> <span class="n">ISO7816_9ErrorChecker</span>
+<span class="kn">from</span> <span class="nn">smartcard.sw.SWExceptions</span> <span class="kn">import</span> <span class="n">SWException</span><span class="p">,</span> <span class="n">WarningProcessingException</span>
+
+
+<span class="c"># define the apdus used in this script</span>
+<span class="n">GET_RESPONSE</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0XA0</span><span class="p">,</span> <span class="mh">0XC0</span><span class="p">,</span> <span class="mo">00</span><span class="p">,</span> <span class="mo">00</span><span class="p">]</span>
+<span class="n">SELECT</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0xA0</span><span class="p">,</span> <span class="mh">0xA4</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x02</span><span class="p">]</span>
+<span class="n">DF_TELECOM</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x7F</span><span class="p">,</span> <span class="mh">0x10</span><span class="p">]</span>
+
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+
+    <span class="k">print</span> <span class="s">&#39;Insert a card within 10 seconds&#39;</span>
+    <span class="k">print</span> <span class="s">&#39;Cards without a DF_TELECOM will except&#39;</span>
+
+    <span class="c"># request any card type</span>
+    <span class="n">cardtype</span> <span class="o">=</span> <span class="n">AnyCardType</span><span class="p">()</span>
+    <span class="n">cardrequest</span> <span class="o">=</span> <span class="n">CardRequest</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">cardType</span><span class="o">=</span><span class="n">cardtype</span><span class="p">)</span>
+    <span class="n">cardservice</span> <span class="o">=</span> <span class="n">cardrequest</span><span class="o">.</span><span class="n">waitforcard</span><span class="p">()</span>
+
+    <span class="c"># use ISO7816-4 and ISO7816-8 error checking strategy</span>
+    <span class="c"># first check iso7816_8 errors, then iso7816_4 errors</span>
+    <span class="n">errorchain</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">errorchain</span> <span class="o">=</span> <span class="p">[</span><span class="n">ErrorCheckingChain</span><span class="p">(</span><span class="n">errorchain</span><span class="p">,</span> <span class="n">ISO7816_9ErrorChecker</span><span class="p">())]</span>
+    <span class="n">errorchain</span> <span class="o">=</span> <span class="p">[</span><span class="n">ErrorCheckingChain</span><span class="p">(</span><span class="n">errorchain</span><span class="p">,</span> <span class="n">ISO7816_8ErrorChecker</span><span class="p">())]</span>
+    <span class="n">errorchain</span> <span class="o">=</span> <span class="p">[</span><span class="n">ErrorCheckingChain</span><span class="p">(</span><span class="n">errorchain</span><span class="p">,</span> <span class="n">ISO7816_4ErrorChecker</span><span class="p">())]</span>
+    <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">setErrorCheckingChain</span><span class="p">(</span><span class="n">errorchain</span><span class="p">)</span>
+
+    <span class="c"># filter Warning Processing Exceptions (sw1 = 0x62 or 0x63)</span>
+    <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">addSWExceptionToFilter</span><span class="p">(</span><span class="n">WarningProcessingException</span><span class="p">)</span>
+
+    <span class="c"># attach the console tracer</span>
+    <span class="n">observer</span> <span class="o">=</span> <span class="n">ConsoleCardConnectionObserver</span><span class="p">()</span>
+    <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">addObserver</span><span class="p">(</span><span class="n">observer</span><span class="p">)</span>
+
+    <span class="c"># connect to the card and perform a few transmits</span>
+    <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">apdu</span> <span class="o">=</span> <span class="n">SELECT</span> <span class="o">+</span> <span class="n">DF_TELECOM</span>
+        <span class="n">response</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span> <span class="o">=</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">transmit</span><span class="p">(</span><span class="n">apdu</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">sw1</span> <span class="o">==</span> <span class="mh">0x9F</span><span class="p">:</span>
+            <span class="n">apdu</span> <span class="o">=</span> <span class="n">GET_RESPONSE</span> <span class="o">+</span> <span class="p">[</span><span class="n">sw2</span><span class="p">]</span>
+            <span class="n">response</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span> <span class="o">=</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">transmit</span><span class="p">(</span><span class="n">apdu</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="n">SWException</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">print</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+
+    <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
+
+    <span class="kn">import</span> <span class="nn">sys</span>
+    <span class="k">if</span> <span class="s">&#39;win32&#39;</span> <span class="o">==</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&#39;press Enter to continue&#39;</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="implementing-a-custom-errorchecker">
+<h2>Implementing a custom ErrorChecker<a class="headerlink" href="#implementing-a-custom-errorchecker" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#! /usr/bin/env python</span>
+<span class="sd">&quot;&quot;&quot;Sample script for APDU error checking with a custom error checker.</span>
+
+<span class="sd">__author__ = &quot;http://www.gemalto.com&quot;</span>
+
+<span class="sd">Copyright 2001-2012 gemalto</span>
+<span class="sd">Author: Jean-Daniel Aussel, mailto:jean-daniel.aussel@gemalto.com</span>
+
+<span class="sd">This file is part of pyscard.</span>
+
+<span class="sd">pyscard is free software; you can redistribute it and/or modify</span>
+<span class="sd">it under the terms of the GNU Lesser General Public License as published by</span>
+<span class="sd">the Free Software Foundation; either version 2.1 of the License, or</span>
+<span class="sd">(at your option) any later version.</span>
+
+<span class="sd">pyscard is distributed in the hope that it will be useful,</span>
+<span class="sd">but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="sd">MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="sd">GNU Lesser General Public License for more details.</span>
+
+<span class="sd">You should have received a copy of the GNU Lesser General Public License</span>
+<span class="sd">along with pyscard; if not, write to the Free Software</span>
+<span class="sd">Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">smartcard.CardType</span> <span class="kn">import</span> <span class="n">AnyCardType</span>
+<span class="kn">from</span> <span class="nn">smartcard.CardRequest</span> <span class="kn">import</span> <span class="n">CardRequest</span>
+<span class="kn">from</span> <span class="nn">smartcard.CardConnectionObserver</span> <span class="kn">import</span> <span class="n">ConsoleCardConnectionObserver</span>
+
+<span class="kn">from</span> <span class="nn">smartcard.sw.ErrorCheckingChain</span> <span class="kn">import</span> <span class="n">ErrorCheckingChain</span>
+<span class="kn">from</span> <span class="nn">smartcard.sw.ErrorChecker</span> <span class="kn">import</span> <span class="n">ErrorChecker</span>
+<span class="kn">from</span> <span class="nn">smartcard.sw.SWExceptions</span> <span class="kn">import</span> <span class="n">SWException</span>
+
+
+<span class="k">class</span> <span class="nc">MyErrorChecker</span><span class="p">(</span><span class="n">ErrorChecker</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Our custom error checker that will except if 0x61&lt;sw1&lt;0x70.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span><span class="p">):</span>
+        <span class="k">print</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span>
+        <span class="k">if</span> <span class="mh">0x61</span> <span class="o">&lt;</span> <span class="n">sw1</span> <span class="ow">and</span> <span class="mh">0x70</span> <span class="o">&gt;</span> <span class="n">sw1</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SWException</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span><span class="p">)</span>
+
+<span class="c"># define the apdus used in this script</span>
+<span class="n">GET_RESPONSE</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0XA0</span><span class="p">,</span> <span class="mh">0XC0</span><span class="p">,</span> <span class="mo">00</span><span class="p">,</span> <span class="mo">00</span><span class="p">]</span>
+<span class="n">SELECT</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0xA0</span><span class="p">,</span> <span class="mh">0xA4</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x02</span><span class="p">]</span>
+<span class="n">DF_TELECOM</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x7F</span><span class="p">,</span> <span class="mh">0x10</span><span class="p">]</span>
+
+<span class="k">if</span> <span class="n">__name__</span> <span class="o">==</span> <span class="s">&#39;__main__&#39;</span><span class="p">:</span>
+
+    <span class="k">print</span> <span class="s">&#39;Insert a card within 10 seconds&#39;</span>
+    <span class="k">print</span> <span class="s">&#39;Cards without a DF_TELECOM will except&#39;</span>
+
+    <span class="c"># request any card</span>
+    <span class="n">cardtype</span> <span class="o">=</span> <span class="n">AnyCardType</span><span class="p">()</span>
+    <span class="n">cardrequest</span> <span class="o">=</span> <span class="n">CardRequest</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">cardType</span><span class="o">=</span><span class="n">cardtype</span><span class="p">)</span>
+    <span class="n">cardservice</span> <span class="o">=</span> <span class="n">cardrequest</span><span class="o">.</span><span class="n">waitforcard</span><span class="p">()</span>
+
+    <span class="c"># our error checking chain</span>
+    <span class="n">errorchain</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">errorchain</span> <span class="o">=</span> <span class="p">[</span><span class="n">ErrorCheckingChain</span><span class="p">([],</span> <span class="n">MyErrorChecker</span><span class="p">())]</span>
+    <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">setErrorCheckingChain</span><span class="p">(</span><span class="n">errorchain</span><span class="p">)</span>
+
+    <span class="c"># attach the console tracer</span>
+    <span class="n">observer</span> <span class="o">=</span> <span class="n">ConsoleCardConnectionObserver</span><span class="p">()</span>
+    <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">addObserver</span><span class="p">(</span><span class="n">observer</span><span class="p">)</span>
+
+    <span class="c"># send a few apdus; exceptions will occur upon errors</span>
+    <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">SELECT</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0xA0</span><span class="p">,</span> <span class="mh">0xA4</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x02</span><span class="p">]</span>
+        <span class="n">DF_TELECOM</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x7F</span><span class="p">,</span> <span class="mh">0x10</span><span class="p">]</span>
+        <span class="n">apdu</span> <span class="o">=</span> <span class="n">SELECT</span> <span class="o">+</span> <span class="n">DF_TELECOM</span>
+        <span class="n">response</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span> <span class="o">=</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">transmit</span><span class="p">(</span><span class="n">apdu</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">sw1</span> <span class="o">==</span> <span class="mh">0x9F</span><span class="p">:</span>
+            <span class="n">GET_RESPONSE</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0XA0</span><span class="p">,</span> <span class="mh">0XC0</span><span class="p">,</span> <span class="mo">00</span><span class="p">,</span> <span class="mo">00</span><span class="p">]</span>
+            <span class="n">apdu</span> <span class="o">=</span> <span class="n">GET_RESPONSE</span> <span class="o">+</span> <span class="p">[</span><span class="n">sw2</span><span class="p">]</span>
+            <span class="n">response</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span> <span class="o">=</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">transmit</span><span class="p">(</span><span class="n">apdu</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">SWException</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">print</span> <span class="n">e</span><span class="p">,</span> <span class="s">&quot;</span><span class="si">%x</span><span class="s"> </span><span class="si">%x</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">sw1</span><span class="p">,</span> <span class="n">e</span><span class="o">.</span><span class="n">sw2</span><span class="p">)</span>
+
+        <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
+
+    <span class="kn">import</span> <span class="nn">sys</span>
+    <span class="k">if</span> <span class="s">&#39;win32&#39;</span> <span class="o">==</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&#39;press Enter to continue&#39;</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="implementing-a-custom-card-type">
+<h2>Implementing a custom card type<a class="headerlink" href="#implementing-a-custom-card-type" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#! /usr/bin/env python</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Sample script that demonstrates how to create a custom CardType.</span>
+
+<span class="sd">__author__ = &quot;http://www.gemalto.com&quot;</span>
+
+<span class="sd">Copyright 2001-2012 gemalto</span>
+<span class="sd">Author: Jean-Daniel Aussel, mailto:jean-daniel.aussel@gemalto.com</span>
+
+<span class="sd">This file is part of pyscard.</span>
+
+<span class="sd">pyscard is free software; you can redistribute it and/or modify</span>
+<span class="sd">it under the terms of the GNU Lesser General Public License as published by</span>
+<span class="sd">the Free Software Foundation; either version 2.1 of the License, or</span>
+<span class="sd">(at your option) any later version.</span>
+
+<span class="sd">pyscard is distributed in the hope that it will be useful,</span>
+<span class="sd">but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="sd">MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="sd">GNU Lesser General Public License for more details.</span>
+
+<span class="sd">You should have received a copy of the GNU Lesser General Public License</span>
+<span class="sd">along with pyscard; if not, write to the Free Software</span>
+<span class="sd">Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">smartcard.CardType</span> <span class="kn">import</span> <span class="n">CardType</span>
+<span class="kn">from</span> <span class="nn">smartcard.CardRequest</span> <span class="kn">import</span> <span class="n">CardRequest</span>
+<span class="kn">from</span> <span class="nn">smartcard.util</span> <span class="kn">import</span> <span class="n">toHexString</span>
+
+
+<span class="k">class</span> <span class="nc">DCCardType</span><span class="p">(</span><span class="n">CardType</span><span class="p">):</span>
+<span class="c"># define our custom CardType</span>
+<span class="c"># this card type defines direct convention card (first atr byte equal to 0x3b)</span>
+
+    <span class="k">def</span> <span class="nf">matches</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">atr</span><span class="p">,</span> <span class="n">reader</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">atr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="mh">0x3B</span>
+
+
+<span class="c"># request a direct convention card</span>
+<span class="n">cardtype</span> <span class="o">=</span> <span class="n">DCCardType</span><span class="p">()</span>
+<span class="n">cardrequest</span> <span class="o">=</span> <span class="n">CardRequest</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cardType</span><span class="o">=</span><span class="n">cardtype</span><span class="p">)</span>
+<span class="n">cardservice</span> <span class="o">=</span> <span class="n">cardrequest</span><span class="o">.</span><span class="n">waitforcard</span><span class="p">()</span>
+
+
+<span class="c"># connect and print atr and reader</span>
+<span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+<span class="k">print</span> <span class="n">toHexString</span><span class="p">(</span><span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">getATR</span><span class="p">())</span>
+<span class="k">print</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">getReader</span><span class="p">()</span>
+
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="k">if</span> <span class="s">&#39;win32&#39;</span> <span class="o">==</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s">&#39;press Enter to continue&#39;</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="monitoring-smartcard-readers">
+<h2>Monitoring smartcard readers<a class="headerlink" href="#monitoring-smartcard-readers" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#! /usr/bin/env python</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Sample script that monitors smartcard readers.</span>
+
+<span class="sd">__author__ = &quot;http://www.gemalto.com&quot;</span>
+
+<span class="sd">Copyright 2001-2012 gemalto</span>
+<span class="sd">Author: Jean-Daniel Aussel, mailto:jean-daniel.aussel@gemalto.com</span>
+
+<span class="sd">This file is part of pyscard.</span>
+
+<span class="sd">pyscard is free software; you can redistribute it and/or modify</span>
+<span class="sd">it under the terms of the GNU Lesser General Public License as published by</span>
+<span class="sd">the Free Software Foundation; either version 2.1 of the License, or</span>
+<span class="sd">(at your option) any later version.</span>
+
+<span class="sd">pyscard is distributed in the hope that it will be useful,</span>
+<span class="sd">but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="sd">MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="sd">GNU Lesser General Public License for more details.</span>
+
+<span class="sd">You should have received a copy of the GNU Lesser General Public License</span>
+<span class="sd">along with pyscard; if not, write to the Free Software</span>
+<span class="sd">Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">sys</span> <span class="kn">import</span> <span class="n">stdin</span><span class="p">,</span> <span class="n">exc_info</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span>
+
+<span class="kn">from</span> <span class="nn">smartcard.ReaderMonitoring</span> <span class="kn">import</span> <span class="n">ReaderMonitor</span><span class="p">,</span> <span class="n">ReaderObserver</span>
+
+
+<span class="k">class</span> <span class="nc">printobserver</span><span class="p">(</span><span class="n">ReaderObserver</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A simple reader observer that is notified</span>
+<span class="sd">    when readers are added/removed from the system and</span>
+<span class="sd">    prints the list of readers</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">observable</span><span class="p">,</span> <span class="p">(</span><span class="n">addedreaders</span><span class="p">,</span> <span class="n">removedreaders</span><span class="p">)):</span>
+        <span class="k">print</span> <span class="s">&quot;Added readers&quot;</span><span class="p">,</span> <span class="n">addedreaders</span>
+        <span class="k">print</span> <span class="s">&quot;Removed readers&quot;</span><span class="p">,</span> <span class="n">removedreaders</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s">&quot;Add or remove a smartcard reader to the system.&quot;</span>
+    <span class="k">print</span> <span class="s">&quot;This program will exit in 10 seconds&quot;</span>
+    <span class="k">print</span> <span class="s">&quot;&quot;</span>
+    <span class="n">readermonitor</span> <span class="o">=</span> <span class="n">ReaderMonitor</span><span class="p">()</span>
+    <span class="n">readerobserver</span> <span class="o">=</span> <span class="n">printobserver</span><span class="p">()</span>
+    <span class="n">readermonitor</span><span class="o">.</span><span class="n">addObserver</span><span class="p">(</span><span class="n">readerobserver</span><span class="p">)</span>
+
+    <span class="n">sleep</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+
+    <span class="c"># don&#39;t forget to remove observer, or the</span>
+    <span class="c"># monitor will poll forever...</span>
+    <span class="n">readermonitor</span><span class="o">.</span><span class="n">deleteObserver</span><span class="p">(</span><span class="n">readerobserver</span><span class="p">)</span>
+
+    <span class="kn">import</span> <span class="nn">sys</span>
+    <span class="k">if</span> <span class="s">&#39;win32&#39;</span> <span class="o">==</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&#39;press Enter to continue&#39;</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="k">except</span><span class="p">:</span>
+    <span class="k">print</span> <span class="n">exc_info</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span> <span class="s">&#39;:&#39;</span><span class="p">,</span> <span class="n">exc_info</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="monitoring-smartcard-insertion-removal">
+<h2>Monitoring smartcard insertion/removal<a class="headerlink" href="#monitoring-smartcard-insertion-removal" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#! /usr/bin/env python</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Sample script that monitors smartcard insertion/removal.</span>
+
+<span class="sd">__author__ = &quot;http://www.gemalto.com&quot;</span>
+
+<span class="sd">Copyright 2001-2012 gemalto</span>
+<span class="sd">Author: Jean-Daniel Aussel, mailto:jean-daniel.aussel@gemalto.com</span>
+
+<span class="sd">This file is part of pyscard.</span>
+
+<span class="sd">pyscard is free software; you can redistribute it and/or modify</span>
+<span class="sd">it under the terms of the GNU Lesser General Public License as published by</span>
+<span class="sd">the Free Software Foundation; either version 2.1 of the License, or</span>
+<span class="sd">(at your option) any later version.</span>
+
+<span class="sd">pyscard is distributed in the hope that it will be useful,</span>
+<span class="sd">but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="sd">MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="sd">GNU Lesser General Public License for more details.</span>
+
+<span class="sd">You should have received a copy of the GNU Lesser General Public License</span>
+<span class="sd">along with pyscard; if not, write to the Free Software</span>
+<span class="sd">Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">sys</span> <span class="kn">import</span> <span class="n">stdin</span><span class="p">,</span> <span class="n">exc_info</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span>
+
+<span class="kn">from</span> <span class="nn">smartcard.CardMonitoring</span> <span class="kn">import</span> <span class="n">CardMonitor</span><span class="p">,</span> <span class="n">CardObserver</span>
+<span class="kn">from</span> <span class="nn">smartcard.util</span> <span class="kn">import</span> <span class="o">*</span>
+
+
+<span class="c"># a simple card observer that prints inserted/removed cards</span>
+<span class="k">class</span> <span class="nc">printobserver</span><span class="p">(</span><span class="n">CardObserver</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A simple card observer that is notified</span>
+<span class="sd">    when cards are inserted/removed from the system and</span>
+<span class="sd">    prints the list of cards</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">observable</span><span class="p">,</span> <span class="p">(</span><span class="n">addedcards</span><span class="p">,</span> <span class="n">removedcards</span><span class="p">)):</span>
+        <span class="k">for</span> <span class="n">card</span> <span class="ow">in</span> <span class="n">addedcards</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;+Inserted: &quot;</span><span class="p">,</span> <span class="n">toHexString</span><span class="p">(</span><span class="n">card</span><span class="o">.</span><span class="n">atr</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">card</span> <span class="ow">in</span> <span class="n">removedcards</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;-Removed: &quot;</span><span class="p">,</span> <span class="n">toHexString</span><span class="p">(</span><span class="n">card</span><span class="o">.</span><span class="n">atr</span><span class="p">)</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s">&quot;Insert or remove a smartcard in the system.&quot;</span>
+    <span class="k">print</span> <span class="s">&quot;This program will exit in 10 seconds&quot;</span>
+    <span class="k">print</span> <span class="s">&quot;&quot;</span>
+    <span class="n">cardmonitor</span> <span class="o">=</span> <span class="n">CardMonitor</span><span class="p">()</span>
+    <span class="n">cardobserver</span> <span class="o">=</span> <span class="n">printobserver</span><span class="p">()</span>
+    <span class="n">cardmonitor</span><span class="o">.</span><span class="n">addObserver</span><span class="p">(</span><span class="n">cardobserver</span><span class="p">)</span>
+
+    <span class="n">sleep</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+
+    <span class="c"># don&#39;t forget to remove observer, or the</span>
+    <span class="c"># monitor will poll forever...</span>
+    <span class="n">cardmonitor</span><span class="o">.</span><span class="n">deleteObserver</span><span class="p">(</span><span class="n">cardobserver</span><span class="p">)</span>
+
+    <span class="kn">import</span> <span class="nn">sys</span>
+    <span class="k">if</span> <span class="s">&#39;win32&#39;</span> <span class="o">==</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&#39;press Enter to continue&#39;</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="k">except</span><span class="p">:</span>
+    <span class="k">print</span> <span class="n">exc_info</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span> <span class="s">&#39;:&#39;</span><span class="p">,</span> <span class="n">exc_info</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="apdu-atr-byte-to-string-utilities">
+<h2>APDU/ATR byte to string utilities<a class="headerlink" href="#apdu-atr-byte-to-string-utilities" title="Permalink to this headline">¶</a></h2>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#! /usr/bin/env python</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Sample script to illustrate toHexString() utility method</span>
+
+<span class="sd">__author__ = &quot;http://www.gemalto.com&quot;</span>
+
+<span class="sd">Copyright 2001-2012 gemalto</span>
+<span class="sd">Author: Jean-Daniel Aussel, mailto:jean-daniel.aussel@gemalto.com</span>
+
+<span class="sd">This file is part of pyscard.</span>
+
+<span class="sd">pyscard is free software; you can redistribute it and/or modify</span>
+<span class="sd">it under the terms of the GNU Lesser General Public License as published by</span>
+<span class="sd">the Free Software Foundation; either version 2.1 of the License, or</span>
+<span class="sd">(at your option) any later version.</span>
+
+<span class="sd">pyscard is distributed in the hope that it will be useful,</span>
+<span class="sd">but WITHOUT ANY WARRANTY; without even the implied warranty of</span>
+<span class="sd">MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the</span>
+<span class="sd">GNU Lesser General Public License for more details.</span>
+
+<span class="sd">You should have received a copy of the GNU Lesser General Public License</span>
+<span class="sd">along with pyscard; if not, write to the Free Software</span>
+<span class="sd">Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA  02110-1301  USA</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">smartcard.util</span> <span class="kn">import</span> <span class="o">*</span>
+
+
+<span class="k">print</span> <span class="mi">40</span> <span class="o">*</span> <span class="s">&#39;-&#39;</span>
+<span class="nb">bytes</span> <span class="o">=</span> <span class="p">[</span><span class="mi">59</span><span class="p">,</span> <span class="mi">101</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">156</span><span class="p">,</span> <span class="mi">17</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+<span class="k">print</span> <span class="s">&#39;bytes = [59, 101, 0, 0, 156, 17, 1, 1, 3]&#39;</span>
+<span class="k">print</span> <span class="s">&#39;toHexString(bytes) =&#39;</span><span class="p">,</span> <span class="n">toHexString</span><span class="p">(</span><span class="nb">bytes</span><span class="p">)</span>
+<span class="k">print</span> <span class="s">&#39;toHexString(bytes, COMMA) =&#39;</span><span class="p">,</span> <span class="n">toHexString</span><span class="p">(</span><span class="nb">bytes</span><span class="p">,</span> <span class="n">COMMA</span><span class="p">)</span>
+<span class="k">print</span> <span class="s">&#39;toHexString(bytes, PACK) =&#39;</span><span class="p">,</span> <span class="n">toHexString</span><span class="p">(</span><span class="nb">bytes</span><span class="p">,</span> <span class="n">PACK</span><span class="p">)</span>
+<span class="k">print</span> <span class="s">&#39;toHexString(bytes, HEX) =&#39;</span><span class="p">,</span> <span class="n">toHexString</span><span class="p">(</span><span class="nb">bytes</span><span class="p">,</span> <span class="n">HEX</span><span class="p">)</span>
+<span class="k">print</span> <span class="s">&#39;toHexString(bytes, HEX | COMMA) =&#39;</span><span class="p">,</span> <span class="n">toHexString</span><span class="p">(</span><span class="nb">bytes</span><span class="p">,</span> <span class="n">HEX</span> <span class="o">|</span> <span class="n">COMMA</span><span class="p">)</span>
+<span class="k">print</span> <span class="s">&#39;toHexString(bytes, HEX | UPPERCASE) =&#39;</span><span class="p">,</span> \
+    <span class="n">toHexString</span><span class="p">(</span><span class="nb">bytes</span><span class="p">,</span> <span class="n">HEX</span> <span class="o">|</span> <span class="n">UPPERCASE</span><span class="p">)</span>
+<span class="k">print</span> <span class="s">&#39;toHexString(bytes, HEX | UPPERCASE | COMMA) =&#39;</span><span class="p">,</span> \
+    <span class="n">toHexString</span><span class="p">(</span><span class="nb">bytes</span><span class="p">,</span> <span class="n">HEX</span> <span class="o">|</span> <span class="n">UPPERCASE</span> <span class="o">|</span> <span class="n">COMMA</span><span class="p">)</span>
+
+
+<span class="k">print</span> <span class="mi">40</span> <span class="o">*</span> <span class="s">&#39;-&#39;</span>
+<span class="nb">bytes</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x3B</span><span class="p">,</span> <span class="mh">0x65</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x9C</span><span class="p">,</span> <span class="mh">0x11</span><span class="p">,</span> <span class="mh">0x01</span><span class="p">,</span> <span class="mh">0x01</span><span class="p">,</span> <span class="mh">0x03</span><span class="p">]</span>
+<span class="k">print</span> <span class="s">&#39;bytes = [ 0x3B, 0x65, 0x00, 0x00, 0x9C, 0x11, 0x01, 0x01, 0x03 ]&#39;</span>
+<span class="k">print</span> <span class="s">&#39;toHexString(bytes, COMMA) =&#39;</span><span class="p">,</span> <span class="n">toHexString</span><span class="p">(</span><span class="nb">bytes</span><span class="p">,</span> <span class="n">COMMA</span><span class="p">)</span>
+<span class="k">print</span> <span class="s">&#39;toHexString(bytes) =&#39;</span><span class="p">,</span> <span class="n">toHexString</span><span class="p">(</span><span class="nb">bytes</span><span class="p">)</span>
+<span class="k">print</span> <span class="s">&#39;toHexString(bytes, PACK) =&#39;</span><span class="p">,</span> <span class="n">toHexString</span><span class="p">(</span><span class="nb">bytes</span><span class="p">,</span> <span class="n">PACK</span><span class="p">)</span>
+<span class="k">print</span> <span class="s">&#39;toHexString(bytes, HEX) =&#39;</span><span class="p">,</span> <span class="n">toHexString</span><span class="p">(</span><span class="nb">bytes</span><span class="p">,</span> <span class="n">HEX</span><span class="p">)</span>
+<span class="k">print</span> <span class="s">&#39;toHexString(bytes, HEX | COMMA) =&#39;</span><span class="p">,</span> <span class="n">toHexString</span><span class="p">(</span><span class="nb">bytes</span><span class="p">,</span> <span class="n">HEX</span> <span class="o">|</span> <span class="n">COMMA</span><span class="p">)</span>
+<span class="k">print</span> <span class="s">&#39;toHexString(bytes, HEX | UPPERCASE) =&#39;</span><span class="p">,</span> \
+    <span class="n">toHexString</span><span class="p">(</span><span class="nb">bytes</span><span class="p">,</span> <span class="n">HEX</span> <span class="o">|</span> <span class="n">UPPERCASE</span><span class="p">)</span>
+<span class="k">print</span> <span class="s">&#39;toHexString(bytes, HEX | UPPERCASE | COMMA) =&#39;</span><span class="p">,</span> \
+    <span class="n">toHexString</span><span class="p">(</span><span class="nb">bytes</span><span class="p">,</span> <span class="n">HEX</span> <span class="o">|</span> <span class="n">UPPERCASE</span> <span class="o">|</span> <span class="n">COMMA</span><span class="p">)</span>
+
+
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="k">if</span> <span class="s">&#39;win32&#39;</span> <span class="o">==</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s">&#39;press Enter to continue&#39;</span>
+    <span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">pyscard smartcard framework samples</a><ul>
+<li><a class="reference internal" href="#display-the-atr-of-inserted-cards">Display the ATR of inserted cards</a></li>
+<li><a class="reference internal" href="#selecting-the-df-telecom-of-a-card">Selecting the DF_TELECOM of a card</a></li>
+<li><a class="reference internal" href="#a-simple-apdu-tracer-and-interpreter">A simple apdu tracer and interpreter</a></li>
+<li><a class="reference internal" href="#tracing-connection-events">Tracing connection events</a></li>
+<li><a class="reference internal" href="#decorating-card-connections-to-add-custom-behavior">Decorating Card Connections to add custom behavior</a></li>
+<li><a class="reference internal" href="#detecting-response-apdu-errors">Detecting response apdu errors</a></li>
+<li><a class="reference internal" href="#implementing-a-custom-errorchecker">Implementing a custom ErrorChecker</a></li>
+<li><a class="reference internal" href="#implementing-a-custom-card-type">Implementing a custom card type</a></li>
+<li><a class="reference internal" href="#monitoring-smartcard-readers">Monitoring smartcard readers</a></li>
+<li><a class="reference internal" href="#monitoring-smartcard-insertion-removal">Monitoring smartcard insertion/removal</a></li>
+<li><a class="reference internal" href="#apdu-atr-byte-to-string-utilities">APDU/ATR byte to string utilities</a></li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="user-guide.html"
+                        title="previous chapter">pyscard user&#8217;s guide</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="pyscard-wrapper.html"
+                        title="next chapter">PCSC wrapper samples</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/pyscard-framework.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="pyscard-wrapper.html" title="PCSC wrapper samples"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="user-guide.html" title="pyscard user’s guide"
+             >previous</a> |</li>
+        <li><a href="index.html">pyscard 1.6.16 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Jean-Daniel Aussel, Ludovic Rousseau.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

@@ -1,0 +1,15 @@
+- complete support of remote readers with Pyro and add in documentation
+
+- document construction of standalone windows application using py2exe
+
+- documentation and implementation of card services
+
+- documentation of CardConnectionDecorator; add a meaningful example (OP secure channel?)
+
+- documentation of wxPython classes; fix wxPython code on Mac OS X
+
+- more error checking chains
+
+- more unit tests
+
+May 2010

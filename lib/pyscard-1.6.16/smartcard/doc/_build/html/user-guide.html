@@ -1,0 +1,1674 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyscard user’s guide &mdash; pyscard 1.6.16 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.6.16',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="pyscard 1.6.16 documentation" href="index.html" />
+    <link rel="next" title="pyscard smartcard framework samples" href="pyscard-framework.html" />
+    <link rel="prev" title="pyscard - python for smart cards" href="index.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="pyscard-framework.html" title="pyscard smartcard framework samples"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="pyscard - python for smart cards"
+             accesskey="P">previous</a> |</li>
+        <li><a href="index.html">pyscard 1.6.16 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="pyscard-user-s-guide">
+<span id="pyscard-user-guide"></span><h1>pyscard user&#8217;s guide<a class="headerlink" href="#pyscard-user-s-guide" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="copyright">
+<h2>Copyright<a class="headerlink" href="#copyright" title="Permalink to this headline">¶</a></h2>
+<div class="line-block">
+<div class="line">Copyright 2001-2009 <a class="reference external" href="http://www.gemalto.com/">Gemalto</a></div>
+<div class="line">Author: Jean-Daniel Aussel, <a class="reference external" href="mailto:jean-daniel&#46;aussel&#37;&#52;&#48;gemalto&#46;com">mailto:jean-daniel<span>&#46;</span>aussel<span>&#64;</span>gemalto<span>&#46;</span>com</a></div>
+</div>
+<p>This file is part of pyscard.</p>
+<p>pyscard is free software; you can redistribute it and/or modify it under
+the terms of the GNU Lesser General Public License as published by the
+Free Software Foundation; either version 2.1 of the License, or (at your
+option) any later version.</p>
+<p>pyscard is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public
+License for more details.</p>
+<p>You should have received a copy of the GNU Lesser General Public License
+along with pyscard; if not, write to the Free Software Foundation, Inc.,
+51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA</p>
+</div>
+<div class="section" id="introduction">
+<h2>Introduction<a class="headerlink" href="#introduction" title="Permalink to this headline">¶</a></h2>
+<p>The pyscard smartcard library is a framework for building smart card
+aware applications in Python. The smartcard module is built on top of
+the PCSC API Python wrapper module.</p>
+<p>pyscard supports Windows 2000 and XP by using the <a class="reference external" href="http://msdn2.microsoft.com/en-us/library/aa374731.aspx#smart_card_functions">Microsoft Smart Card
+Base</a> components, and linux and Mac OS X by using <a class="reference external" href="http://pcsclite.alioth.debian.org/">PCSC-lite</a>.</p>
+</div>
+<div class="section" id="smart-cards">
+<h2>Smart Cards<a class="headerlink" href="#smart-cards" title="Permalink to this headline">¶</a></h2>
+<p>Smart cards are plastic cards having generally the size of a credit card
+and embedding a microprocessor. Smart cards communicate with the outside
+world thru a serial port interface and an half-duplex protocol.
+Smartcards usually interface with a dedicated terminal, such as a
+point-of-sale terminal or a mobile phone. Sometime, smart cards have to
+be interfaced with personal computers. This is the case for some
+applications such as secure login, mail cyphering or digital signature,
+but also for some PC based smart card tools used to personnalize or edit
+the content of smart cards. Smart cards are interfaced with a personnal
+computer using a smart card reader. The smart card reader connects on
+one side to the serial port of the smart card, and on the other side to
+the PC, often nowadays thru a USB port.</p>
+<p>The PCSC workgroup has defined a standard API to interface smart card
+and smart card readers to a PC. The resulting reference implementation
+on linux and Mac OS X operating systems is <a class="reference external" href="http://pcsclite.alioth.debian.org/">PC/SC-lite</a>. All windows operating systems
+also include out of the box smart card support, usually called <a class="reference external" href="http://msdn2.microsoft.com/en-us/library/aa374731.aspx#smart_card_functions">PCSC</a>.</p>
+<p>The PCSC API is implemented in C language, and several bridges are
+provided to access the PCSC API from different languages such as java or
+visual basic. pyscard is a python framework to develop smart card PC
+applications on linux, Mac OS X and windows. pyscard lower layers
+interface to the PCSC API to access the smart cards and smart card
+readers.</p>
+</div>
+<div class="section" id="quick-start">
+<h2>Quick-start<a class="headerlink" href="#quick-start" title="Permalink to this headline">¶</a></h2>
+<p>We will see in this section some variations on how to send APDU commands
+to a smart card.</p>
+<div class="section" id="the-reader-centric-approach">
+<h3>The reader-centric approach<a class="headerlink" href="#the-reader-centric-approach" title="Permalink to this headline">¶</a></h3>
+<p>A PC application interacts with a card by sending list of bytes, known
+as Application Protocol Data Units (APDU). The format of these APDUs is
+defined in the ISO7816-4 standard. To send APDUs to a card, the
+application needs first to connect to a card thru a smart card reader.
+Smart card aware applications that first select a smart card reader,
+then connect to the card inserted in the smart card reader use the
+reader-centric approach.</p>
+<p>In the reader-centric approach, we open a connection with a card thru a
+smart card reader, and send APDU commands to the card using the
+connection:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.System</span> <span class="kn">import</span> <span class="n">readers</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.util</span> <span class="kn">import</span> <span class="n">toHexString</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">r</span><span class="o">=</span><span class="n">readers</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">r</span>
+<span class="go">[&#39;SchlumbergerSema Reflex USB v.2 0&#39;, &#39;Utimaco CardManUSB 0&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">connection</span> <span class="o">=</span> <span class="n">r</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">createConnection</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">connection</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SELECT</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0xA0</span><span class="p">,</span> <span class="mh">0xA4</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x02</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">DF_TELECOM</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x7F</span><span class="p">,</span> <span class="mh">0x10</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="n">transmit</span><span class="p">(</span> <span class="n">SELECT</span> <span class="o">+</span> <span class="n">DF_TELECOM</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="s">&quot;</span><span class="si">%x</span><span class="s"> </span><span class="si">%x</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span><span class="p">)</span>
+<span class="go">9f 1a</span>
+<span class="go">&gt;&gt;&gt;</span>
+</pre></div>
+</div>
+<p>The list of available readers is retrieved with the readers() function.
+We create a connection with the first reader (index 0 for reader 1, 1
+for reader 2, ...) with the r[0].createConnection() call and connect to
+the card with the connect() method of the connection. We can then send
+APDU commands to the card with the transmit() method.</p>
+<p>Scripts written with the reader centric approach however have the
+following drawbacks:</p>
+<ul class="simple">
+<li>the reader index or reader name is hardcoded in the scripts; the
+scripts must be edited to match each user configuration; for example
+in the previous script, we would have to edit the script and change
+r[0] to r[1] for using the second reader</li>
+<li>there is no a-priori knowledge that the card is in the reader; to
+detect card insertion, we would have to execute the script and
+eventually catch a CardConnectionException that would indicate that
+there is no card in the reader.</li>
+<li>there is no built-in check that the card in the reader is of the card
+type we expect; in the previous example, we might try to select the
+DF_TELECOM of an EMV card.</li>
+</ul>
+<p>Most of these issues are solved with the card-centric approach, based on
+card type detection techniques, such as using the Answer To Reset (ATR)
+of the card.</p>
+</div>
+<div class="section" id="the-answer-to-reset-atr">
+<h3>The Answer To Reset (ATR)<a class="headerlink" href="#the-answer-to-reset-atr" title="Permalink to this headline">¶</a></h3>
+<p>The first answer of a smart card inserted in a smart card reader is call
+the ATR. The purpose of the ATR is to describe the supported
+communication parameters. The smart card reader, smart card reader
+driver, and operating system will use these parameters to establish a
+communication with the card. The ATR is described in the ISO7816-3
+standard. The first bytes of the ATR describe the voltage convention
+(direct or inverse), followed by bytes describing the available
+communication interfaces and their respective parameters. These
+interface bytes are then followed by Historical Bytes which are not
+standardized, and are useful for transmitting proprietary informations
+such as the card type, the version of the embedded software, or the card
+state. Finally these historical bytes are eventually followd by a
+checksum byte.</p>
+<p>The class <a class="reference external" href="http://pyscard.sourceforge.net/epydoc/smartcard.ATR.ATR-class.html">smartcard.ATR</a>
+is a pyscard utility class that can interpret the content of an ATR:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c">#! /usr/bin/env python</span>
+<span class="kn">from</span> <span class="nn">smartcard.ATR</span> <span class="kn">import</span> <span class="n">ATR</span>
+<span class="kn">from</span> <span class="nn">smartcard.util</span> <span class="kn">import</span> <span class="n">toHexString</span>
+
+<span class="n">atr</span> <span class="o">=</span> <span class="n">ATR</span><span class="p">([</span><span class="mh">0x3B</span><span class="p">,</span> <span class="mh">0x9E</span><span class="p">,</span> <span class="mh">0x95</span><span class="p">,</span> <span class="mh">0x80</span><span class="p">,</span> <span class="mh">0x1F</span><span class="p">,</span> <span class="mh">0xC3</span><span class="p">,</span> <span class="mh">0x80</span><span class="p">,</span> <span class="mh">0x31</span><span class="p">,</span> <span class="mh">0xA0</span><span class="p">,</span>
+    <span class="mh">0x73</span><span class="p">,</span> <span class="mh">0xBE</span><span class="p">,</span> <span class="mh">0x21</span><span class="p">,</span> <span class="mh">0x13</span><span class="p">,</span> <span class="mh">0x67</span><span class="p">,</span> <span class="mh">0x29</span><span class="p">,</span> <span class="mh">0x02</span><span class="p">,</span> <span class="mh">0x01</span><span class="p">,</span> <span class="mh">0x01</span><span class="p">,</span> <span class="mh">0x81</span><span class="p">,</span><span class="mh">0xCD</span><span class="p">,</span><span class="mh">0xB9</span><span class="p">]</span> <span class="p">)</span>
+<span class="k">print</span> <span class="n">atr</span>
+<span class="k">print</span> <span class="s">&#39;historical bytes: &#39;</span><span class="p">,</span> <span class="n">toHexString</span><span class="p">(</span> <span class="n">atr</span><span class="o">.</span><span class="n">getHistoricalBytes</span><span class="p">()</span> <span class="p">)</span>
+<span class="k">print</span> <span class="s">&#39;checksum:&#39;</span><span class="p">,</span> <span class="s">&quot;0x</span><span class="si">%X</span><span class="s">&quot;</span> <span class="o">%</span> <span class="n">atr</span><span class="o">.</span><span class="n">getChecksum</span><span class="p">()</span>
+<span class="k">print</span> <span class="s">&#39;checksum OK:&#39;</span><span class="p">,</span> <span class="n">atr</span><span class="o">.</span><span class="n">checksumOK</span>
+<span class="k">print</span> <span class="s">&#39;T0 supported:&#39;</span><span class="p">,</span> <span class="n">atr</span><span class="o">.</span><span class="n">isT0Supported</span><span class="p">()</span>
+<span class="k">print</span> <span class="s">&#39;T1 supported:&#39;</span><span class="p">,</span> <span class="n">atr</span><span class="o">.</span><span class="n">isT1Supported</span><span class="p">()</span>
+<span class="k">print</span> <span class="s">&#39;T15 supported:&#39;</span><span class="p">,</span> <span class="n">atr</span><span class="o">.</span><span class="n">isT15Supported</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>Which results in the following output:</p>
+<div class="highlight-python"><div class="highlight"><pre>3B 9E 95 80 1F C3 80 31 A0 73 BE 21 13 67 29 02 01 01 81 CD B9
+historical bytes: 80 31 A0 73 BE 21 13 67 29 02 01 01 81 CD
+checksum: 0xB9
+checksum OK: True
+T0 supported: True
+T1 supported: False
+T15 supported: True
+</pre></div>
+</div>
+<p>In practice, the ATR can be used to detect a particular card, either by
+trying to match a card with a complete ATR, or by matching a card with
+some data in the historical bytes. Smart card aware PC applications that
+detects smart cards based on the content of the ATR use the card-centric
+approach, independently on the smart card reader in which the card is
+inserted..</p>
+</div>
+<div class="section" id="the-card-centric-approach">
+<h3>The card-centric approach<a class="headerlink" href="#the-card-centric-approach" title="Permalink to this headline">¶</a></h3>
+<p>In the card-centric approach, we create a request for a specific type of
+card and wait until a card matching the request is inserted. Once a
+matching card is introduced, a connection to the card is automatically
+created and we can send APDU commands to the card using this connection.</p>
+<div class="section" id="requesting-a-card-by-atr">
+<h4>Requesting a card by ATR<a class="headerlink" href="#requesting-a-card-by-atr" title="Permalink to this headline">¶</a></h4>
+<p>The following scripts requests a card with a known ATR:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.CardType</span> <span class="kn">import</span> <span class="n">ATRCardType</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.CardRequest</span> <span class="kn">import</span> <span class="n">CardRequest</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.util</span> <span class="kn">import</span> <span class="n">toHexString</span><span class="p">,</span> <span class="n">toBytes</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardtype</span> <span class="o">=</span> <span class="n">ATRCardType</span><span class="p">(</span> <span class="n">toBytes</span><span class="p">(</span> <span class="s">&quot;3B 16 94 20 02 01 00 00 0D&quot;</span> <span class="p">)</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardrequest</span> <span class="o">=</span> <span class="n">CardRequest</span><span class="p">(</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cardType</span><span class="o">=</span><span class="n">cardtype</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardservice</span> <span class="o">=</span> <span class="n">cardrequest</span><span class="o">.</span><span class="n">waitforcard</span><span class="p">()</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">toHexString</span><span class="p">(</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">getATR</span><span class="p">()</span> <span class="p">)</span>
+<span class="go">3B 16 94 20 02 01 00 00 0D</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SELECT</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0xA0</span><span class="p">,</span> <span class="mh">0xA4</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x02</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">DF_TELECOM</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x7F</span><span class="p">,</span> <span class="mh">0x10</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">data</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span> <span class="o">=</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">transmit</span><span class="p">(</span> <span class="n">SELECT</span> <span class="o">+</span> <span class="n">DF_TELECOM</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="s">&quot;</span><span class="si">%x</span><span class="s"> </span><span class="si">%x</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span><span class="p">)</span>
+<span class="go">9f 1a</span>
+<span class="go">&gt;&gt;&gt;</span>
+</pre></div>
+</div>
+<p>To request a card with a know ATR, you must first create an <a class="reference external" href="http://pyscard.sourceforge.net/epydoc/smartcard.CardType.ATRCardType-class.html">ATRCardType</a>
+object with the desired ATR:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cardtype</span> <span class="o">=</span> <span class="n">ATRCardType</span><span class="p">(</span> <span class="n">toBytes</span><span class="p">(</span> <span class="s">&quot;3B 16 94 20 02 01 00 00 0D&quot;</span> <span class="p">)</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>And then create a <a class="reference external" href="http://pyscard.sourceforge.net/epydoc/smartcard.CardRequest.CardRequest-class.html">CardRequest</a>
+for this card type. In the sample, we request a time-out of 1 second.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cardrequest</span> <span class="o">=</span> <span class="n">CardRequest</span><span class="p">(</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cardType</span><span class="o">=</span><span class="n">cardtype</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardservice</span> <span class="o">=</span> <span class="n">cardrequest</span><span class="o">.</span><span class="n">waitforcard</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The waitforcard() will either return with a card service or a time-out.
+The card service connection attribute can be used thereafter to transmit
+APDU commands to the card, as with the reader centric approach.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">toHexString</span><span class="p">(</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">getATR</span><span class="p">()</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>If necessary, the reader used for the connection can be accessed thru
+the <a class="reference external" href="http://pyscard.sourceforge.net/epydoc/smartcard.CardConnection.CardConnection-class.html">CardConnection</a>
+object:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">getReader</span><span class="p">()</span>
+<span class="go">SchlumbergerSema Reflex USB v.2 0</span>
+</pre></div>
+</div>
+<p>The <a class="reference external" href="http://pyscard.sourceforge.net/epydoc/smartcard.CardType.ATRCardType-class.html">ATRCardType</a>
+also supports masks:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.CardType</span> <span class="kn">import</span> <span class="n">ATRCardType</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.CardRequest</span> <span class="kn">import</span> <span class="n">CardRequest</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.util</span> <span class="kn">import</span> <span class="n">toHexString</span><span class="p">,</span> <span class="n">toBytes</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardtype</span> <span class="o">=</span> <span class="n">ATRCardType</span><span class="p">(</span> <span class="n">toBytes</span><span class="p">(</span> <span class="s">&quot;3B 15 94 20 02 01 00 00 0F&quot;</span> <span class="p">),</span> <span class="n">toBytes</span><span class="p">(</span> <span class="s">&quot;00 00 FF FF FF FF FF FF 00&quot;</span> <span class="p">)</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardrequest</span> <span class="o">=</span> <span class="n">CardRequest</span><span class="p">(</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cardType</span><span class="o">=</span><span class="n">cardtype</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardservice</span> <span class="o">=</span> <span class="n">cardrequest</span><span class="o">.</span><span class="n">waitforcard</span><span class="p">()</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">toHexString</span><span class="p">(</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">getATR</span><span class="p">()</span> <span class="p">)</span>
+<span class="go">3B 16 94 20 02 01 00 00 0D</span>
+</pre></div>
+</div>
+<p>Other CardTypes are available, and new CardTypes can be created, as
+described below.</p>
+</div>
+<div class="section" id="requesting-any-card">
+<h4>Requesting any card<a class="headerlink" href="#requesting-any-card" title="Permalink to this headline">¶</a></h4>
+<p>The <a class="reference external" href="http://pyscard.sourceforge.net/epydoc/smartcard.CardType.AnyCardType-class.html">AnyCardType</a>
+is useful for requesting any card in any reader:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.CardType</span> <span class="kn">import</span> <span class="n">AnyCardType</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.CardRequest</span> <span class="kn">import</span> <span class="n">CardRequest</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.util</span> <span class="kn">import</span> <span class="n">toHexString</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardtype</span> <span class="o">=</span> <span class="n">AnyCardType</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardrequest</span> <span class="o">=</span> <span class="n">CardRequest</span><span class="p">(</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cardType</span><span class="o">=</span><span class="n">cardtype</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardservice</span> <span class="o">=</span> <span class="n">cardrequest</span><span class="o">.</span><span class="n">waitforcard</span><span class="p">()</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">toHexString</span><span class="p">(</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">getATR</span><span class="p">()</span> <span class="p">)</span>
+<span class="go">3B 16 94 20 02 01 00 00 0D</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">getReader</span><span class="p">()</span>
+<span class="go">SchlumbergerSema Reflex USB v.2 0</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="custom-cardtypes">
+<h4>Custom CardTypes<a class="headerlink" href="#custom-cardtypes" title="Permalink to this headline">¶</a></h4>
+<p>Custom CardTypes can be created, e.g. a card type that checks the ATR
+and the historical bytes of the card. To create a custom CardType,
+deriver your CardType class from the <a class="reference external" href="http://pyscard.sourceforge.net/epydoc/smartcard.CardType.CardType-class.html">CardType</a>
+base class (or any other CardType) and override the matches() method.
+For exemple to create a DCCardType that will match cards with the direct
+convention (first byte of ATR to 0x3b):</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.CardType</span> <span class="kn">import</span> <span class="n">CardType</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.CardRequest</span> <span class="kn">import</span> <span class="n">CardRequest</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.util</span> <span class="kn">import</span> <span class="n">toHexString</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">DCCardType</span><span class="p">(</span><span class="n">CardType</span><span class="p">):</span>
+<span class="gp">... </span>     <span class="k">def</span> <span class="nf">matches</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">atr</span><span class="p">,</span> <span class="n">reader</span><span class="o">=</span><span class="bp">None</span> <span class="p">):</span>
+<span class="gp">... </span>         <span class="k">return</span> <span class="n">atr</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">==</span><span class="mh">0x3B</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardtype</span> <span class="o">=</span> <span class="n">DCCardType</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardrequest</span> <span class="o">=</span> <span class="n">CardRequest</span><span class="p">(</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cardType</span><span class="o">=</span><span class="n">cardtype</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardservice</span> <span class="o">=</span> <span class="n">cardrequest</span><span class="o">.</span><span class="n">waitforcard</span><span class="p">()</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">toHexString</span><span class="p">(</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">getATR</span><span class="p">()</span> <span class="p">)</span>
+<span class="go">3B 16 94 20 02 01 00 00 0D</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">getReader</span><span class="p">()</span>
+<span class="go">SchlumbergerSema Reflex USB v.2 0</span>
+<span class="go">&gt;&gt;&gt;</span>
+</pre></div>
+</div>
+<p>Scripts written with the card-centric approach fixes the problems of the
+reader-centric approach:</p>
+<ul class="simple">
+<li>there is no assumption concerning the reader index or reader name; the
+desired card will be located in any reader</li>
+<li>the request will block or time-out if the desired card type is not
+inserted since we request the desired card type, the script is not
+played on an unknown or uncompatible card</li>
+</ul>
+<p>Scripts written with the card-centric approach have however the
+following drawbacks:</p>
+<ul class="simple">
+<li>the script is limited to a specific card type; we have to modify the
+script if we want to execute the script on another card type. For
+exemple, we have to modify the ATR of the card if we are using the
+ATRCardType. This can be partially solved by having a custom CardType
+that matches several ATRs, though.</li>
+</ul>
+</div>
+<div class="section" id="selecting-the-card-communication-protocol">
+<h4>Selecting the card communication protocol<a class="headerlink" href="#selecting-the-card-communication-protocol" title="Permalink to this headline">¶</a></h4>
+<p>Communication parameters are mostly important for the protocol
+negociation between the smart card reader and the card. The main
+smartcard protocols are the T=0 protocol and the T=1 protocol, for byte
+or block transmission, respectively. The required protocol can be
+specified at card connection or card transmission.</p>
+<p>By defaults, the connect() method of the CardConnection object.will try
+to connect using either the T=0 or T=1 protocol. To force a connection
+protocol, you can pass the required protocol to the connect() method.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.CardType</span> <span class="kn">import</span> <span class="n">AnyCardType</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.CardConnection</span> <span class="kn">import</span> <span class="n">CardConnection</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.CardRequest</span> <span class="kn">import</span> <span class="n">CardRequest</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.util</span> <span class="kn">import</span> <span class="n">toHexString</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardtype</span> <span class="o">=</span> <span class="n">AnyCardType</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardrequest</span> <span class="o">=</span> <span class="n">CardRequest</span><span class="p">(</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cardType</span><span class="o">=</span><span class="n">cardtype</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardservice</span> <span class="o">=</span> <span class="n">cardrequest</span><span class="o">.</span><span class="n">waitforcard</span><span class="p">()</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span> <span class="n">CardConnection</span><span class="o">.</span><span class="n">T1_protocol</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">toHexString</span><span class="p">(</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">getATR</span><span class="p">()</span> <span class="p">)</span>
+<span class="go">3B 16 94 20 02 01 00 00 0D</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">getReader</span><span class="p">()</span>
+<span class="go">SchlumbergerSema Reflex USB v.2 0</span>
+</pre></div>
+</div>
+<p>Alternatively, you can specify the required protocol in the
+CardConnection transmit() method:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.CardType</span> <span class="kn">import</span> <span class="n">AnyCardType</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.CardConnection</span> <span class="kn">import</span> <span class="n">CardConnection</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.CardRequest</span> <span class="kn">import</span> <span class="n">CardRequest</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.util</span> <span class="kn">import</span> <span class="n">toHexString</span><span class="p">,</span> <span class="n">toBytes</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardtype</span> <span class="o">=</span> <span class="n">AnyCardType</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardrequest</span> <span class="o">=</span> <span class="n">CardRequest</span><span class="p">(</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cardType</span><span class="o">=</span><span class="n">cardtype</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardservice</span> <span class="o">=</span> <span class="n">cardrequest</span><span class="o">.</span><span class="n">waitforcard</span><span class="p">()</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SELECT</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0xA0</span><span class="p">,</span> <span class="mh">0xA4</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x02</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">DF_TELECOM</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x7F</span><span class="p">,</span> <span class="mh">0x10</span><span class="p">]</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">apdu</span> <span class="o">=</span> <span class="n">SELECT</span><span class="o">+</span><span class="n">DF_TELECOM</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="s">&#39;sending &#39;</span> <span class="o">+</span> <span class="n">toHexString</span><span class="p">(</span><span class="n">apdu</span><span class="p">)</span>
+<span class="go">sending A0 A4 00 00 02 7F 10</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">response</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span> <span class="o">=</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">transmit</span><span class="p">(</span> <span class="n">apdu</span><span class="p">,</span> <span class="n">CardConnection</span><span class="o">.</span><span class="n">T1_protocol</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="s">&#39;response: &#39;</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="s">&#39; status words: &#39;</span><span class="p">,</span> <span class="s">&quot;</span><span class="si">%x</span><span class="s"> </span><span class="si">%x</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span><span class="p">)</span>
+<span class="go">response: [] status words: 9f 1a</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="n">sw1</span> <span class="o">==</span> <span class="mh">0x9F</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">GET_RESPONSE</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0XA0</span><span class="p">,</span> <span class="mh">0XC0</span><span class="p">,</span> <span class="mo">00</span><span class="p">,</span> <span class="mo">00</span> <span class="p">]</span>
+<span class="gp">... </span>    <span class="n">apdu</span> <span class="o">=</span> <span class="n">GET_RESPONSE</span> <span class="o">+</span> <span class="p">[</span><span class="n">sw2</span><span class="p">]</span>
+<span class="gp">... </span>    <span class="k">print</span> <span class="s">&#39;sending &#39;</span> <span class="o">+</span> <span class="n">toHexString</span><span class="p">(</span><span class="n">apdu</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">response</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span> <span class="o">=</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">transmit</span><span class="p">(</span> <span class="n">apdu</span> <span class="p">)</span>
+<span class="gp">... </span>    <span class="k">print</span> <span class="s">&#39;response: &#39;</span><span class="p">,</span> <span class="n">toHexString</span><span class="p">(</span><span class="n">response</span><span class="p">),</span> <span class="s">&#39; status words: &#39;</span><span class="p">,</span> <span class="s">&quot;</span><span class="si">%x</span><span class="s"> </span><span class="si">%x</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="go">sending A0 C0 00 00 1A</span>
+<span class="go">response: 00 00 00 00 7F 10 02 00 00 00 00 00 0D 13 00 0A 04 00 83 8A 83 8A 00 01 00 00 status words: 90 0</span>
+<span class="go">&gt;&gt;&gt;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="the-object-centric-approach">
+<h3>The object-centric approach<a class="headerlink" href="#the-object-centric-approach" title="Permalink to this headline">¶</a></h3>
+<p>In the object-centric approach, we associate a high-level object with a
+set of smart cards supported by the object. For example we associate a
+javacard loader class with a set of javacard smart cards. We create a
+request for the specific object, and wait until a card supported by the
+object is inserted. Once a card supported by the object is inserted, we
+perform the required function by calling the objec methods.</p>
+<p>To be written...</p>
+</div>
+</div>
+<div class="section" id="tracing-apdus">
+<h2>Tracing APDUs<a class="headerlink" href="#tracing-apdus" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="the-brute-force">
+<h3>The brute force<a class="headerlink" href="#the-brute-force" title="Permalink to this headline">¶</a></h3>
+<p>A straightforward way of tracing command and response APDUs is to insert
+print statements around the transmit() method calls:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.CardType</span> <span class="kn">import</span> <span class="n">ATRCardType</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.CardRequest</span> <span class="kn">import</span> <span class="n">CardRequest</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.util</span> <span class="kn">import</span> <span class="n">toHexString</span><span class="p">,</span> <span class="n">toBytes</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardtype</span> <span class="o">=</span> <span class="n">ATRCardType</span><span class="p">(</span> <span class="n">toBytes</span><span class="p">(</span> <span class="s">&quot;3B 16 94 20 02 01 00 00 0D&quot;</span> <span class="p">)</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardrequest</span> <span class="o">=</span> <span class="n">CardRequest</span><span class="p">(</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cardType</span><span class="o">=</span><span class="n">cardtype</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardservice</span> <span class="o">=</span> <span class="n">cardrequest</span><span class="o">.</span><span class="n">waitforcard</span><span class="p">()</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SELECT</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0xA0</span><span class="p">,</span> <span class="mh">0xA4</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x02</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">DF_TELECOM</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x7F</span><span class="p">,</span> <span class="mh">0x10</span><span class="p">]</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">apdu</span> <span class="o">=</span> <span class="n">SELECT</span><span class="o">+</span><span class="n">DF_TELECOM</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="s">&#39;sending &#39;</span> <span class="o">+</span> <span class="n">toHexString</span><span class="p">(</span><span class="n">apdu</span><span class="p">)</span>
+<span class="go">sending A0 A4 00 00 02 7F 10</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">response</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span> <span class="o">=</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">transmit</span><span class="p">(</span> <span class="n">apdu</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="s">&#39;response: &#39;</span><span class="p">,</span> <span class="n">response</span><span class="p">,</span> <span class="s">&#39; status words: &#39;</span><span class="p">,</span> <span class="s">&quot;</span><span class="si">%x</span><span class="s"> </span><span class="si">%x</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span><span class="p">)</span>
+<span class="go">response: [] status words: 9f 1a</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="n">sw1</span> <span class="o">==</span> <span class="mh">0x9F</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">GET_RESPONSE</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0XA0</span><span class="p">,</span> <span class="mh">0XC0</span><span class="p">,</span> <span class="mo">00</span><span class="p">,</span> <span class="mo">00</span> <span class="p">]</span>
+<span class="gp">... </span>    <span class="n">apdu</span> <span class="o">=</span> <span class="n">GET_RESPONSE</span> <span class="o">+</span> <span class="p">[</span><span class="n">sw2</span><span class="p">]</span>
+<span class="gp">... </span>    <span class="k">print</span> <span class="s">&#39;sending &#39;</span> <span class="o">+</span> <span class="n">toHexString</span><span class="p">(</span><span class="n">apdu</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">response</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span> <span class="o">=</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">transmit</span><span class="p">(</span> <span class="n">apdu</span> <span class="p">)</span>
+<span class="gp">... </span>    <span class="k">print</span> <span class="s">&#39;response: &#39;</span><span class="p">,</span> <span class="n">toHexString</span><span class="p">(</span><span class="n">response</span><span class="p">),</span> <span class="s">&#39; status words: &#39;</span><span class="p">,</span> <span class="s">&quot;</span><span class="si">%x</span><span class="s"> </span><span class="si">%x</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="go">sending A0 C0 00 00 1A</span>
+<span class="go">response: 00 00 00 00 7F 10 02 00 00 00 00 00 0D 13 00 0A 04 00 83 8A 83 8A 00 01 00 00 status words: 90 0</span>
+<span class="go">&gt;&gt;&gt;</span>
+</pre></div>
+</div>
+<p>Scripts written this way are quite difficult to read, because there are
+more tracing statements than actual apdu transmits..</p>
+<p>A small improvement in visibility would be to replace the print
+instructions by functions, e.g.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.CardType</span> <span class="kn">import</span> <span class="n">ATRCardType</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.CardRequest</span> <span class="kn">import</span> <span class="n">CardRequest</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.util</span> <span class="kn">import</span> <span class="n">toHexString</span><span class="p">,</span> <span class="n">toBytes</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardtype</span> <span class="o">=</span> <span class="n">ATRCardType</span><span class="p">(</span> <span class="n">toBytes</span><span class="p">(</span> <span class="s">&quot;3B 16 94 20 02 01 00 00 0D&quot;</span> <span class="p">)</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardrequest</span> <span class="o">=</span> <span class="n">CardRequest</span><span class="p">(</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cardType</span><span class="o">=</span><span class="n">cardtype</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardservice</span> <span class="o">=</span> <span class="n">cardrequest</span><span class="o">.</span><span class="n">waitforcard</span><span class="p">()</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SELECT</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0xA0</span><span class="p">,</span> <span class="mh">0xA4</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x02</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">DF_TELECOM</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x7F</span><span class="p">,</span> <span class="mh">0x10</span><span class="p">]</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">trace_command</span><span class="p">(</span><span class="n">apdu</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="k">print</span> <span class="s">&#39;sending &#39;</span> <span class="o">+</span> <span class="n">toHexString</span><span class="p">(</span><span class="n">apdu</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">trace_response</span><span class="p">(</span> <span class="n">response</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span> <span class="p">):</span>
+<span class="gp">... </span>    <span class="k">if</span> <span class="bp">None</span><span class="o">==</span><span class="n">response</span><span class="p">:</span> <span class="n">response</span><span class="o">=</span><span class="p">[]</span>
+<span class="gp">... </span>    <span class="k">print</span> <span class="s">&#39;response: &#39;</span><span class="p">,</span> <span class="n">toHexString</span><span class="p">(</span><span class="n">response</span><span class="p">),</span> <span class="s">&#39; status words: &#39;</span><span class="p">,</span> <span class="s">&quot;</span><span class="si">%x</span><span class="s"> </span><span class="si">%x</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">apdu</span> <span class="o">=</span> <span class="n">SELECT</span><span class="o">+</span><span class="n">DF_TELECOM</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">trace_command</span><span class="p">(</span><span class="n">apdu</span><span class="p">)</span>
+<span class="go">sending A0 A4 00 00 02 7F 10</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">response</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span> <span class="o">=</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">transmit</span><span class="p">(</span> <span class="n">apdu</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">trace_response</span><span class="p">(</span> <span class="n">response</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span> <span class="p">)</span>
+<span class="go">response: status words: 9f 1a</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="n">sw1</span> <span class="o">==</span> <span class="mh">0x9F</span><span class="p">:</span>
+<span class="gp">... </span>   <span class="n">GET_RESPONSE</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0XA0</span><span class="p">,</span> <span class="mh">0XC0</span><span class="p">,</span> <span class="mo">00</span><span class="p">,</span> <span class="mo">00</span> <span class="p">]</span>
+<span class="gp">... </span>   <span class="n">apdu</span> <span class="o">=</span> <span class="n">GET_RESPONSE</span> <span class="o">+</span> <span class="p">[</span><span class="n">sw2</span><span class="p">]</span>
+<span class="gp">... </span>   <span class="n">trace_command</span><span class="p">(</span><span class="n">apdu</span><span class="p">)</span>
+<span class="gp">... </span>   <span class="n">response</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span> <span class="o">=</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">transmit</span><span class="p">(</span> <span class="n">apdu</span> <span class="p">)</span>
+<span class="gp">... </span>   <span class="n">trace_response</span><span class="p">(</span> <span class="n">response</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span> <span class="p">)</span>
+<span class="gp">...</span>
+<span class="go">sending A0 C0 00 00 1A</span>
+<span class="go">response: 00 00 00 00 7F 10 02 00 00 00 00 00 0D 13 00 0A 04 00 83 8A 83 8A 00 01 00 00 status words: 90 0</span>
+<span class="go">&gt;&gt;&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-card-connection-observers-to-trace-apdu-transmission">
+<h3>Using card connection observers to trace apdu transmission<a class="headerlink" href="#using-card-connection-observers-to-trace-apdu-transmission" title="Permalink to this headline">¶</a></h3>
+<p>The prefered solution is to implement a card connection observer, and
+register the observer with the card connection. The card connection will
+then notify the observer when card connection events occur (e.g.
+connection, disconnection, apdu command or apdu response). This is
+illustrated in the following script:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.CardType</span> <span class="kn">import</span> <span class="n">AnyCardType</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.CardRequest</span> <span class="kn">import</span> <span class="n">CardRequest</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.CardConnectionObserver</span> <span class="kn">import</span> <span class="n">ConsoleCardConnectionObserver</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">GET_RESPONSE</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0XA0</span><span class="p">,</span> <span class="mh">0XC0</span><span class="p">,</span> <span class="mo">00</span><span class="p">,</span> <span class="mo">00</span> <span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SELECT</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0xA0</span><span class="p">,</span> <span class="mh">0xA4</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x02</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">DF_TELECOM</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x7F</span><span class="p">,</span> <span class="mh">0x10</span><span class="p">]</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardtype</span> <span class="o">=</span> <span class="n">AnyCardType</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardrequest</span> <span class="o">=</span> <span class="n">CardRequest</span><span class="p">(</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">cardType</span><span class="o">=</span><span class="n">cardtype</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardservice</span> <span class="o">=</span> <span class="n">cardrequest</span><span class="o">.</span><span class="n">waitforcard</span><span class="p">()</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">observer</span><span class="o">=</span><span class="n">ConsoleCardConnectionObserver</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">addObserver</span><span class="p">(</span> <span class="n">observer</span> <span class="p">)</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+<span class="go">connecting to SchlumbergerSema Reflex USB v.2 0</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">apdu</span> <span class="o">=</span> <span class="n">SELECT</span><span class="o">+</span><span class="n">DF_TELECOM</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">response</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span> <span class="o">=</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">transmit</span><span class="p">(</span> <span class="n">apdu</span> <span class="p">)</span>
+<span class="go">&gt; A0 A4 00 00 02 7F 10</span>
+<span class="go">&lt; [] 9F 1A</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="n">sw1</span> <span class="o">==</span> <span class="mh">0x9F</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">apdu</span> <span class="o">=</span> <span class="n">GET_RESPONSE</span> <span class="o">+</span> <span class="p">[</span><span class="n">sw2</span><span class="p">]</span>
+<span class="gp">... </span>    <span class="n">response</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span> <span class="o">=</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">transmit</span><span class="p">(</span> <span class="n">apdu</span> <span class="p">)</span>
+<span class="gp">... </span><span class="k">else</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">print</span> <span class="s">&#39;no DF_TELECOM&#39;</span>
+<span class="gp">...</span>
+<span class="go">&gt; A0 C0 00 00 1A</span>
+<span class="go">&lt; 00 00 00 00 7F 10 02 00 00 00 00 00 0D 13 00 0A 04 00 83 8A 83 8A 00 01 00 00 90 0</span>
+<span class="go">&gt;&gt;&gt;</span>
+</pre></div>
+</div>
+<p>In this script, a <a class="reference external" href="http://pyscard.sourceforge.net/epydoc/smartcard.CardConnectionObserver.ConsoleCardConnectionObserver-class.html">ConsoleCardConnectionObserver</a>
+is attached to the card service connection once the watiforcard() call
+returns.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">observer</span><span class="o">=</span><span class="n">ConsoleCardConnectionObserver</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">addObserver</span><span class="p">(</span> <span class="n">observer</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>On card connection events (connect, disconnect, transmit command apdu,
+receive response apdu), the card connection notifies its obersers with a
+<a class="reference external" href="http://pyscard.sourceforge.net/epydoc/smartcard.CardConnectionEvent.CardConnectionEvent-class.html">CarConnectionEvent</a>
+including the event type and the event data. The
+<a class="reference external" href="http://pyscard.sourceforge.net/epydoc/smartcard.CardConnectionObserver.ConsoleCardConnectionObserver-class.html">ConsoleCardConnectionObserver</a>
+is a simple observer that will print on the console the card connection
+events. The class definition is the following:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">ConsoleCardConnectionObserver</span><span class="p">(</span> <span class="n">CardConnectionObserver</span> <span class="p">):</span>
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">cardconnection</span><span class="p">,</span> <span class="n">ccevent</span> <span class="p">):</span>
+
+        <span class="k">if</span> <span class="s">&#39;connect&#39;</span><span class="o">==</span><span class="n">ccevent</span><span class="o">.</span><span class="n">type</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&#39;connecting to &#39;</span> <span class="o">+</span> <span class="n">cardconnection</span><span class="o">.</span><span class="n">getReader</span><span class="p">()</span>
+
+        <span class="k">elif</span> <span class="s">&#39;disconnect&#39;</span><span class="o">==</span><span class="n">ccevent</span><span class="o">.</span><span class="n">type</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&#39;disconnecting from &#39;</span> <span class="o">+</span> <span class="n">cardconnection</span><span class="o">.</span><span class="n">getReader</span><span class="p">()</span>
+
+        <span class="k">elif</span> <span class="s">&#39;command&#39;</span><span class="o">==</span><span class="n">ccevent</span><span class="o">.</span><span class="n">type</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&#39;&gt; &#39;</span><span class="p">,</span> <span class="n">toHexString</span><span class="p">(</span> <span class="n">ccevent</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">)</span>
+
+        <span class="k">elif</span> <span class="s">&#39;response&#39;</span><span class="o">==</span><span class="n">ccevent</span><span class="o">.</span><span class="n">type</span><span class="p">:</span>
+            <span class="k">if</span> <span class="p">[]</span><span class="o">==</span><span class="n">ccevent</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="k">print</span> <span class="s">&#39;&lt; [] &#39;</span><span class="p">,</span> <span class="s">&quot;</span><span class="si">%-2X</span><span class="s"> </span><span class="si">%-2X</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">ccevent</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:])</span>
+            <span class="k">else</span><span class="p">:</span>
+        <span class="k">print</span> <span class="s">&#39;&lt; &#39;</span><span class="p">,</span> <span class="n">toHexString</span><span class="p">(</span><span class="n">ccevent</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="s">&quot;</span><span class="si">%-2X</span><span class="s"> </span><span class="si">%-2X</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">ccevent</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:])</span>
+</pre></div>
+</div>
+<p>The console card connection observer is thus printing the connect,
+disconnect, command and response apdu events:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+<span class="go">connecting to SchlumbergerSema Reflex USB v.2 0</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">apdu</span> <span class="o">=</span> <span class="n">SELECT</span><span class="o">+</span><span class="n">DF_TELECOM</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">response</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span> <span class="o">=</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">transmit</span><span class="p">(</span> <span class="n">apdu</span> <span class="p">)</span>
+<span class="go">&gt; A0 A4 00 00 02 7F 10</span>
+<span class="go">&lt; [] 9F 1A</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="n">sw1</span> <span class="o">==</span> <span class="mh">0x9F</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">apdu</span> <span class="o">=</span> <span class="n">GET_RESPONSE</span> <span class="o">+</span> <span class="p">[</span><span class="n">sw2</span><span class="p">]</span>
+<span class="gp">... </span>    <span class="n">response</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span> <span class="o">=</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">transmit</span><span class="p">(</span> <span class="n">apdu</span> <span class="p">)</span>
+<span class="gp">... </span><span class="k">else</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">print</span> <span class="s">&#39;no DF_TELECOM&#39;</span>
+<span class="gp">...</span>
+<span class="go">&gt; A0 C0 00 00 1A</span>
+<span class="go">&lt; 00 00 00 00 7F 10 02 00 00 00 00 00 0D 13 00 0A 04 00 83 8A 83 8A 00 01 00 00 90 0</span>
+</pre></div>
+</div>
+<p>A card connection observer&#8217;s update methode is called upon card
+connection event, with the connection and the connection event as
+parameters. The <a class="reference external" href="http://pyscard.sourceforge.net/epydoc/smartcard.CardConnectionEvent.CardConnectionEvent-class.html">CardConnectionEvent</a>
+class definition is the following:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">CardConnectionEvent</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Base class for card connection events.</span>
+
+<span class="sd">   This event is notified by CardConnection objects.</span>
+
+<span class="sd">   type: &#39;connect&#39;, &#39;disconnect&#39;, &#39;command&#39;, &#39;response&#39;</span>
+<span class="sd">   args: None for &#39;connect&#39; or &#39;disconnect&#39;</span>
+<span class="sd">   command APDU byte list for &#39;command&#39;</span>
+<span class="sd">   [response data, sw1, sw2] for &#39;response&#39;</span>
+<span class="sd">   type: &#39;connect&#39; args:&quot;&quot;&quot;</span>
+   <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="nb">type</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+       <span class="bp">self</span><span class="o">.</span><span class="n">type</span><span class="o">=</span><span class="nb">type</span>
+       <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="o">=</span><span class="n">args</span>
+</pre></div>
+</div>
+<p>You can write your own card connection observer, for example to perform
+fancy output in a wxWindows frame, or apdu interpretation. The following
+scripts defines a small SELECT and GET RESPONSE apdu interpreter:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.CardType</span> <span class="kn">import</span> <span class="n">AnyCardType</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.CardRequest</span> <span class="kn">import</span> <span class="n">CardRequest</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.CardConnectionObserver</span> <span class="kn">import</span> <span class="n">CardConnectionObserver</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.util</span> <span class="kn">import</span> <span class="n">toHexString</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">string</span> <span class="kn">import</span> <span class="n">replace</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">TracerAndSELECTInterpreter</span><span class="p">(</span> <span class="n">CardConnectionObserver</span> <span class="p">):</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">cardconnection</span><span class="p">,</span> <span class="n">ccevent</span> <span class="p">):</span>
+<span class="gp">... </span>        <span class="k">if</span> <span class="s">&#39;connect&#39;</span><span class="o">==</span><span class="n">ccevent</span><span class="o">.</span><span class="n">type</span><span class="p">:</span>
+<span class="gp">... </span>            <span class="k">print</span> <span class="s">&#39;connecting to &#39;</span> <span class="o">+</span> <span class="n">cardconnection</span><span class="o">.</span><span class="n">getReader</span><span class="p">()</span>
+<span class="gp">... </span>        <span class="k">elif</span> <span class="s">&#39;disconnect&#39;</span><span class="o">==</span><span class="n">ccevent</span><span class="o">.</span><span class="n">type</span><span class="p">:</span>
+<span class="gp">... </span>            <span class="k">print</span> <span class="s">&#39;disconnecting from &#39;</span> <span class="o">+</span> <span class="n">cardconnection</span><span class="o">.</span><span class="n">getReader</span><span class="p">()</span>
+<span class="gp">... </span>        <span class="k">elif</span> <span class="s">&#39;command&#39;</span><span class="o">==</span><span class="n">ccevent</span><span class="o">.</span><span class="n">type</span><span class="p">:</span>
+<span class="gp">... </span>            <span class="nb">str</span><span class="o">=</span><span class="n">toHexString</span><span class="p">(</span><span class="n">ccevent</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+<span class="gp">... </span>            <span class="nb">str</span> <span class="o">=</span> <span class="n">replace</span><span class="p">(</span> <span class="nb">str</span> <span class="p">,</span> <span class="s">&quot;A0 A4 00 00 02&quot;</span><span class="p">,</span> <span class="s">&quot;SELECT&quot;</span> <span class="p">)</span>
+<span class="gp">... </span>            <span class="nb">str</span> <span class="o">=</span> <span class="n">replace</span><span class="p">(</span> <span class="nb">str</span> <span class="p">,</span> <span class="s">&quot;A0 C0 00 00&quot;</span><span class="p">,</span> <span class="s">&quot;GET RESPONSE&quot;</span> <span class="p">)</span>
+<span class="gp">... </span>            <span class="k">print</span> <span class="s">&#39;&gt; &#39;</span><span class="p">,</span> <span class="nb">str</span>
+<span class="gp">... </span>        <span class="k">elif</span> <span class="s">&#39;response&#39;</span><span class="o">==</span><span class="n">ccevent</span><span class="o">.</span><span class="n">type</span><span class="p">:</span>
+<span class="gp">... </span>            <span class="k">if</span> <span class="p">[]</span><span class="o">==</span><span class="n">ccevent</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+<span class="gp">... </span>                <span class="k">print</span> <span class="s">&#39;&lt; [] &#39;</span><span class="p">,</span> <span class="s">&quot;</span><span class="si">%-2X</span><span class="s"> </span><span class="si">%-2X</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">ccevent</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:])</span>
+<span class="gp">... </span>            <span class="k">else</span><span class="p">:</span>
+<span class="gp">... </span>                <span class="k">print</span> <span class="s">&#39;&lt; &#39;</span><span class="p">,</span> <span class="n">toHexString</span><span class="p">(</span><span class="n">ccevent</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="s">&quot;</span><span class="si">%-2X</span><span class="s"> </span><span class="si">%-2X</span><span class="s">&quot;</span> <span class="o">%</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">ccevent</span><span class="o">.</span><span class="n">args</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">:])</span>
+<span class="gp">...</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">GET_RESPONSE</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0XA0</span><span class="p">,</span> <span class="mh">0XC0</span><span class="p">,</span> <span class="mo">00</span><span class="p">,</span> <span class="mo">00</span> <span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SELECT</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0xA0</span><span class="p">,</span> <span class="mh">0xA4</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x02</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">DF_TELECOM</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x7F</span><span class="p">,</span> <span class="mh">0x10</span><span class="p">]</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardtype</span> <span class="o">=</span> <span class="n">AnyCardType</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardrequest</span> <span class="o">=</span> <span class="n">CardRequest</span><span class="p">(</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">cardType</span><span class="o">=</span><span class="n">cardtype</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardservice</span> <span class="o">=</span> <span class="n">cardrequest</span><span class="o">.</span><span class="n">waitforcard</span><span class="p">()</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">observer</span><span class="o">=</span><span class="n">TracerAndSELECTInterpreter</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">addObserver</span><span class="p">(</span> <span class="n">observer</span> <span class="p">)</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+<span class="go">connecting to SchlumbergerSema Reflex USB v.2 0</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">apdu</span> <span class="o">=</span> <span class="n">SELECT</span><span class="o">+</span><span class="n">DF_TELECOM</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">response</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span> <span class="o">=</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">transmit</span><span class="p">(</span> <span class="n">apdu</span> <span class="p">)</span>
+<span class="go">&gt; SELECT 7F 10</span>
+<span class="go">&lt; [] 9F 1A</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="n">sw1</span> <span class="o">==</span> <span class="mh">0x9F</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">apdu</span> <span class="o">=</span> <span class="n">GET_RESPONSE</span> <span class="o">+</span> <span class="p">[</span><span class="n">sw2</span><span class="p">]</span>
+<span class="gp">... </span>    <span class="n">response</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span> <span class="o">=</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">transmit</span><span class="p">(</span> <span class="n">apdu</span> <span class="p">)</span>
+<span class="gp">... </span><span class="k">else</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">print</span> <span class="s">&#39;no DF_TELECOM&#39;</span>
+<span class="gp">...</span>
+<span class="go">&gt; GET RESPONSE 1A</span>
+<span class="go">&lt; 00 00 00 00 7F 10 02 00 00 00 00 00 0D 13 00 0A 04 00 83 8A 83 8A 00 01 00 00 90 0</span>
+<span class="go">&gt;&gt;&gt;</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="testing-for-apdu-transmission-errors">
+<h2>Testing for APDU transmission errors<a class="headerlink" href="#testing-for-apdu-transmission-errors" title="Permalink to this headline">¶</a></h2>
+<p>Upon transmission and processing of an APDU, the smart card returns a
+pair of status words, SW1 and SW2, to report various success or error
+codes following the required processing. Some of these success or error
+codes are standardized in ISO7816-4, ISO7816-8 or ISO7816-9, for
+example. Other status word codes are standardized by standardization
+bodies such as Open Platform (e.g. javacard), 3GPP (e.g. SIM or USIM
+cards), or Eurocard-Mastercard-Visa (EMV) (e.g. banking cards). Finally,
+any smart card application developper can defined application related
+proprietary codes; for example the MUSCLE applet defines a set of
+prioprietary codes related to the MUSCLE applet features.</p>
+<p>Some of these status word codes are uniques, but others have a different
+meaning depending on the card type and its supported standards. For
+example, ISO7816-4 defines the error code 0x62 0x82 as &#8220;File
+Invalidated&#8221;, whereas in Open Platform 2.1 the same error code is
+defined as &#8220;Card life cycle is CARD_LOCKED&#8221;. As a result, the list of
+error codes that can be returned by a smart card and they interpretation
+depend on the card type. The following discussion outlines possible
+strategies to check and report smart card status word errors.</p>
+<div class="section" id="the-brute-force-for-testing-apdu-transmission-errors">
+<h3>The brute force for testing APDU transmission errors<a class="headerlink" href="#the-brute-force-for-testing-apdu-transmission-errors" title="Permalink to this headline">¶</a></h3>
+<p>As for APDU tracing, a straightforward way of checking for errors in response APDUs during the execution of scripts is to insert testt statements after the transmit() method calls:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.CardType</span> <span class="kn">import</span> <span class="n">AnyCardType</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.CardRequest</span> <span class="kn">import</span> <span class="n">CardRequest</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.CardConnectionObserver</span> <span class="kn">import</span> <span class="n">ConsoleCardConnectionObserver</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">GET_RESPONSE</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0XA0</span><span class="p">,</span> <span class="mh">0XC0</span><span class="p">,</span> <span class="mo">00</span><span class="p">,</span> <span class="mo">00</span> <span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SELECT</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0xA0</span><span class="p">,</span> <span class="mh">0xA4</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x02</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">DF_TELECOM</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x7F</span><span class="p">,</span> <span class="mh">0x10</span><span class="p">]</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardtype</span> <span class="o">=</span> <span class="n">AnyCardType</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardrequest</span> <span class="o">=</span> <span class="n">CardRequest</span><span class="p">(</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">cardType</span><span class="o">=</span><span class="n">cardtype</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardservice</span> <span class="o">=</span> <span class="n">cardrequest</span><span class="o">.</span><span class="n">waitforcard</span><span class="p">()</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">observer</span><span class="o">=</span><span class="n">ConsoleCardConnectionObserver</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">addObserver</span><span class="p">(</span> <span class="n">observer</span> <span class="p">)</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+<span class="go">connecting to Utimaco CardManUSB 0</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">apdu</span> <span class="o">=</span> <span class="n">SELECT</span><span class="o">+</span><span class="n">DF_TELECOM</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">response</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span> <span class="o">=</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">transmit</span><span class="p">(</span> <span class="n">apdu</span> <span class="p">)</span>
+<span class="go">&gt; A0 A4 00 00 02 7F 10</span>
+<span class="go">&lt; [] 6E 0</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="n">sw1</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mh">0x61</span><span class="p">,</span> <span class="mh">0x6f</span><span class="p">):</span>
+<span class="gp">... </span><span class="k">print</span> <span class="s">&quot;Error: sw1: </span><span class="si">%x</span><span class="s"> sw2: </span><span class="si">%x</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span><span class="p">)</span>
+<span class="gp">...</span>
+<span class="go">Error: sw1: 6e sw2: 0</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="n">sw1</span> <span class="o">==</span> <span class="mh">0x9F</span><span class="p">:</span>
+<span class="gp">... </span><span class="n">apdu</span> <span class="o">=</span> <span class="n">GET_RESPONSE</span> <span class="o">+</span> <span class="p">[</span><span class="n">sw2</span><span class="p">]</span>
+<span class="gp">... </span><span class="n">response</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span> <span class="o">=</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">transmit</span><span class="p">(</span> <span class="n">apdu</span> <span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
+<span class="go">disconnecting from Utimaco CardManUSB 0</span>
+<span class="go">&gt;&gt;&gt;</span>
+</pre></div>
+</div>
+<p>Scripts written this way are quite difficult to read, because there are
+more error detection statements than actual apdu transmits.</p>
+<p>An improvement in visibility is to wrap the transmit instruction inside
+a function mytransmit, e.g.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.CardType</span> <span class="kn">import</span> <span class="n">AnyCardType</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.CardRequest</span> <span class="kn">import</span> <span class="n">CardRequest</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.CardConnectionObserver</span> <span class="kn">import</span> <span class="n">ConsoleCardConnectionObserver</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">mytransmit</span><span class="p">(</span> <span class="n">connection</span><span class="p">,</span> <span class="n">apdu</span> <span class="p">):</span>
+<span class="gp">... </span><span class="n">response</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="n">transmit</span><span class="p">(</span> <span class="n">apdu</span> <span class="p">)</span>
+<span class="gp">... </span><span class="k">if</span> <span class="n">sw1</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mh">0x61</span><span class="p">,</span> <span class="mh">0x6f</span><span class="p">):</span>
+<span class="gp">... </span><span class="k">print</span> <span class="s">&quot;Error: sw1: </span><span class="si">%x</span><span class="s"> sw2: </span><span class="si">%x</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span><span class="p">)</span>
+<span class="gp">... </span><span class="k">return</span> <span class="n">response</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span>
+<span class="gp">...</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">GET_RESPONSE</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0XA0</span><span class="p">,</span> <span class="mh">0XC0</span><span class="p">,</span> <span class="mo">00</span><span class="p">,</span> <span class="mo">00</span> <span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">SELECT</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0xA0</span><span class="p">,</span> <span class="mh">0xA4</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x02</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">DF_TELECOM</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x7F</span><span class="p">,</span> <span class="mh">0x10</span><span class="p">]</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardtype</span> <span class="o">=</span> <span class="n">AnyCardType</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardrequest</span> <span class="o">=</span> <span class="n">CardRequest</span><span class="p">(</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">cardType</span><span class="o">=</span><span class="n">cardtype</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardservice</span> <span class="o">=</span> <span class="n">cardrequest</span><span class="o">.</span><span class="n">waitforcard</span><span class="p">()</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">observer</span><span class="o">=</span><span class="n">ConsoleCardConnectionObserver</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">addObserver</span><span class="p">(</span> <span class="n">observer</span> <span class="p">)</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+<span class="go">connecting to Utimaco CardManUSB 0</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">apdu</span> <span class="o">=</span> <span class="n">SELECT</span><span class="o">+</span><span class="n">DF_TELECOM</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">response</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span> <span class="o">=</span> <span class="n">mytransmit</span><span class="p">(</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="p">,</span> <span class="n">apdu</span> <span class="p">)</span>
+<span class="go">&gt; A0 A4 00 00 02 7F 10</span>
+<span class="go">&lt; [] 6E 0</span>
+<span class="go">Error: sw1: 6e sw2: 0</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">if</span> <span class="n">sw1</span> <span class="o">==</span> <span class="mh">0x9F</span><span class="p">:</span>
+<span class="gp">... </span><span class="n">apdu</span> <span class="o">=</span> <span class="n">GET_RESPONSE</span> <span class="o">+</span> <span class="p">[</span><span class="n">sw2</span><span class="p">]</span>
+<span class="gp">... </span><span class="n">response</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span> <span class="o">=</span> <span class="n">mytransmit</span><span class="p">(</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="p">,</span> <span class="n">apdu</span> <span class="p">)</span>
+<span class="gp">...</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">disconnect</span><span class="p">()</span>
+<span class="go">disconnecting from Utimaco CardManUSB 0</span>
+<span class="go">&gt;&gt;&gt;</span>
+</pre></div>
+</div>
+<p>The prefered solution is for testing errors is to use
+smarcard.sw.ErrorChecker, as described in the following section.</p>
+</div>
+<div class="section" id="checking-apdu-transmission-errors-with-error-checkers">
+<h3>Checking APDU transmission errors with error checkers<a class="headerlink" href="#checking-apdu-transmission-errors-with-error-checkers" title="Permalink to this headline">¶</a></h3>
+<p>Status word errors can occur from different sources. The ISO7816-4
+standards defines status words for sw1 in the range 0x62 to 0x6F and
+some values of sw2, except for 0x66 which is reserved for security
+related issues. The ISO7816-8 standards define other status words, e.g.
+sw1=0x68 and sw2=0x83 or 0x84 for command chaining errors. Other
+standards, like Open Platform, define additional status words error,
+e.g. sw1=0x94 and sw2=0x84.</p>
+<p>The prefered strategy for status word error checking is based around
+individual error checkers (smartcard.sw.ErrorChecker) that can be
+chained into an error checking chain (smartcars.sw.ErrorCheckingChain).</p>
+<div class="section" id="error-checkers">
+<h4>Error checkers<a class="headerlink" href="#error-checkers" title="Permalink to this headline">¶</a></h4>
+<p>An error checker is a class deriving from <a class="reference external" href="http://pyscard.sourceforge.net/epydoc/smartcard.sw.ErrorChecker.ErrorChecker-class.html">ErrorChecker</a>
+that checks for recognized sw1, sw2 error conditions when called, and
+raises an exception when finding such condition. This is illustrated in
+the following sample:</p>
+<div class="highlight-python"><div class="highlight"><pre>&gt;&gt;&gt; from smartcard.sw.ISO7816_4ErrorChecker import ISO7816_4ErrorChecker
+&gt;&gt;&gt;
+&gt;&gt;&gt; errorchecker=ISO7816_4ErrorChecker()
+&gt;&gt;&gt; errorchecker( [], 0x90, 0x00 )
+&gt;&gt;&gt; errorchecker( [], 0x6A, 0x80 )
+Traceback (most recent call last):
+File &quot;&lt;stdin&gt;&quot;, line 1, in ?
+File &quot;D:\projects\pyscard-install\factory\python\lib\site-packages\smartcard\sw\ISO7816_4ErrorChecker.py&quot;, line 137, in __call__
+raise exception( data, sw1, sw2, message )
+smartcard.sw.SWExceptions.CheckingErrorException: &#39;Status word exception: checking error - Incorrect parameters in the data field!&#39;
+&gt;&gt;&gt;
+</pre></div>
+</div>
+<p>The first call to error checker does not raise an exception, since 90 00
+does not report any error. The second calls however raises a
+CheckingErrorException.</p>
+</div>
+<div class="section" id="error-checking-chains">
+<h4>Error checking chains<a class="headerlink" href="#error-checking-chains" title="Permalink to this headline">¶</a></h4>
+<p>Error checkers can be chained into <a class="reference external" href="http://pyscard.sourceforge.net/epydoc/smartcard.sw.ErrorCheckingChain.ErrorCheckingChain-class.html">error checking chain</a>.
+Each checker in the chain is called until an error condition is met, in
+which case an exception is raised. This is illustrated in the following
+sample:</p>
+<div class="highlight-python"><div class="highlight"><pre>&gt;&gt;&gt; from smartcard.sw.ISO7816_4ErrorChecker import ISO7816_4ErrorChecker
+&gt;&gt;&gt; from smartcard.sw.ISO7816_8ErrorChecker import ISO7816_8ErrorChecker
+&gt;&gt;&gt; from smartcard.sw.ISO7816_9ErrorChecker import ISO7816_9ErrorChecker
+&gt;&gt;&gt;
+&gt;&gt;&gt; from smartcard.sw.ErrorCheckingChain import ErrorCheckingChain
+&gt;&gt;&gt;
+&gt;&gt;&gt; errorchain = []
+&gt;&gt;&gt; errorchain=[ ErrorCheckingChain( errorchain, ISO7816_9ErrorChecker() ),
+... ErrorCheckingChain( errorchain, ISO7816_8ErrorChecker() ),
+... ErrorCheckingChain( errorchain, ISO7816_4ErrorChecker() ) ]
+&gt;&gt;&gt;
+&gt;&gt;&gt; errorchain[0]( [], 0x90, 0x00 )
+&gt;&gt;&gt; errorchain[0]( [], 0x6A, 0x8a )
+Traceback (most recent call last):
+File &quot;&lt;stdin&gt;&quot;, line 1, in ?
+File &quot;D:\projects\pyscard-install\factory\python\lib\site-packages\smartcard\sw\ErrorCheckingChain.py&quot;, line 60,
+in __call__
+self.strategy( data, sw1, sw2 )
+File &quot;D:\projects\pyscard-install\factory\python\lib\site-packages\smartcard\sw\ISO7816_9ErrorChecker.py&quot;, line 74, in __call__
+raise exception( data, sw1, sw2, message )
+smartcard.sw.SWExceptions.CheckingErrorException: &#39;Status word exception: checking error - DF name already exists!&#39;
+&gt;&gt;&gt;
+</pre></div>
+</div>
+<p>In this sample, an error checking chain is created that will check first
+for iso 7816-9 errors, then iso7816-8 errors, and finally iso7816-4
+errors.</p>
+<p>The first call to the error chain does not raise an exception, since 90
+00 does not report any error. The second calls however raises a
+CheckingErrorException, caused by the iso7816-9 error checker.</p>
+</div>
+<div class="section" id="filtering-exceptions">
+<h4>Filtering exceptions<a class="headerlink" href="#filtering-exceptions" title="Permalink to this headline">¶</a></h4>
+<p>You can filter undesired exceptions in a chain by adding a filtered
+exception to the error checking chain:</p>
+<div class="highlight-python"><div class="highlight"><pre>&gt;&gt;&gt; from smartcard.sw.ISO7816_4ErrorChecker import ISO7816_4ErrorChecker
+&gt;&gt;&gt; from smartcard.sw.ISO7816_8ErrorChecker import ISO7816_8ErrorChecker
+&gt;&gt;&gt; from smartcard.sw.ISO7816_9ErrorChecker import ISO7816_9ErrorChecker
+&gt;&gt;&gt;
+&gt;&gt;&gt; from smartcard.sw.ErrorCheckingChain import ErrorCheckingChain
+&gt;&gt;&gt;
+&gt;&gt;&gt; errorchain = []
+&gt;&gt;&gt; errorchain=[ ErrorCheckingChain( errorchain, ISO7816_9ErrorChecker() ),
+... ErrorCheckingChain( errorchain, ISO7816_8ErrorChecker() ),
+... ErrorCheckingChain( errorchain, ISO7816_4ErrorChecker() ) ]
+&gt;&gt;&gt;
+&gt;&gt;&gt;
+&gt;&gt;&gt; errorchain[0]( [], 0x90, 0x00 )
+&gt;&gt;&gt; errorchain[0]( [], 0x62, 0x00 )
+Traceback (most recent call last):
+File &quot;&lt;stdin&gt;&quot;, line 1, in ?
+File &quot;D:\projects\pyscard-install\factory\python\lib\site-packages\smartcard\sw\ErrorCheckingChain.py&quot;, line 72, in __call__
+return self.next()( data, sw1, sw2 )
+File &quot;D:\projects\pyscard-install\factory\python\lib\site-packages\smartcard\sw\ErrorCheckingChain.py&quot;, line 72, in __call__
+return self.next()( data, sw1, sw2 )
+File &quot;D:\projects\pyscard-install\factory\python\lib\site-packages\smartcard\sw\ErrorCheckingChain.py&quot;, line 60, in __call__
+self.strategy( data, sw1, sw2 )
+File &quot;D:\projects\pyscard-install\factory\python\lib\site-packages\smartcard\sw\ISO7816_4ErrorChecker.py&quot;, line 137, in __call__
+raise exception( data, sw1, sw2, message )
+smartcard.sw.SWExceptions.WarningProcessingException: &#39;Status word exception: warning processing - Response padded/ More APDU commands expected!&#39;
+&gt;&gt;&gt;
+&gt;&gt;&gt; from smartcard.sw.SWExceptions import WarningProcessingException
+&gt;&gt;&gt;
+&gt;&gt;&gt; errorchain[0].addFilterException( WarningProcessingException )
+&gt;&gt;&gt; errorchain[0]( [], 0x62, 0x00 )
+&gt;&gt;&gt;
+</pre></div>
+</div>
+<p>The first call to the error chain with sw1 sw2 = 62 00 raises a
+<a class="reference external" href="http://pyscard.sourceforge.net/epydoc/smartcard.sw.SWExceptions.WarningProcessingException-class.html">WarningProcessingException</a>.</p>
+<div class="highlight-python"><div class="highlight"><pre>...
+&gt;&gt;&gt; errorchain[0]( [], 0x62, 0x00 )
+Traceback (most recent call last):
+...
+</pre></div>
+</div>
+<p>After adding a filter for <a class="reference external" href="http://pyscard.sourceforge.net/epydoc/smartcard.sw.SWExceptions.WarningProcessingException-class.html">WarningProcessingException</a>,
+the second call to the error chain with sw1 sw2 = 62 00 does not raise
+any exception:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.sw.SWExceptions</span> <span class="kn">import</span> <span class="n">WarningProcessingException</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">errorchain</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">addFilterException</span><span class="p">(</span> <span class="n">WarningProcessingException</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">errorchain</span><span class="p">[</span><span class="mi">0</span><span class="p">](</span> <span class="p">[],</span> <span class="mh">0x62</span><span class="p">,</span> <span class="mh">0x00</span> <span class="p">)</span>
+<span class="go">&gt;&gt;&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="detecting-response-apdu-errors-for-a-card-connection">
+<h4>Detecting response APDU errors for a card connection<a class="headerlink" href="#detecting-response-apdu-errors-for-a-card-connection" title="Permalink to this headline">¶</a></h4>
+<p>To detect APDU response errors during transmission, simply set the error checking chain of the connection used for transmission:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">smartcard.CardType</span> <span class="kn">import</span> <span class="n">AnyCardType</span>
+<span class="kn">from</span> <span class="nn">smartcard.CardRequest</span> <span class="kn">import</span> <span class="n">CardRequest</span>
+<span class="kn">from</span> <span class="nn">smartcard.CardConnectionObserver</span> <span class="kn">import</span> <span class="n">ConsoleCardConnectionObserver</span>
+
+<span class="kn">from</span> <span class="nn">smartcard.sw.ErrorCheckingChain</span> <span class="kn">import</span> <span class="n">ErrorCheckingChain</span>
+<span class="kn">from</span> <span class="nn">smartcard.sw.ISO7816_4ErrorChecker</span> <span class="kn">import</span> <span class="n">ISO7816_4ErrorChecker</span>
+<span class="kn">from</span> <span class="nn">smartcard.sw.ISO7816_8ErrorChecker</span> <span class="kn">import</span> <span class="n">ISO7816_8ErrorChecker</span>
+<span class="kn">from</span> <span class="nn">smartcard.sw.SWExceptions</span> <span class="kn">import</span> <span class="n">SWException</span><span class="p">,</span> <span class="n">WarningProcessingException</span>
+
+<span class="c"># request any card</span>
+<span class="n">cardtype</span> <span class="o">=</span> <span class="n">AnyCardType</span><span class="p">()</span>
+<span class="n">cardrequest</span> <span class="o">=</span> <span class="n">CardRequest</span><span class="p">(</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">cardType</span><span class="o">=</span><span class="n">cardtype</span> <span class="p">)</span>
+<span class="n">cardservice</span> <span class="o">=</span> <span class="n">cardrequest</span><span class="o">.</span><span class="n">waitforcard</span><span class="p">()</span>
+
+<span class="c"># our error checking chain</span>
+<span class="n">errorchain</span><span class="o">=</span><span class="p">[]</span>
+<span class="n">errorchain</span><span class="o">=</span><span class="p">[</span> <span class="n">ErrorCheckingChain</span><span class="p">(</span> <span class="n">errorchain</span><span class="p">,</span> <span class="n">ISO7816_8ErrorChecker</span><span class="p">()</span> <span class="p">),</span>
+             <span class="n">ErrorCheckingChain</span><span class="p">(</span> <span class="n">errorchain</span><span class="p">,</span> <span class="n">ISO7816_4ErrorChecker</span><span class="p">()</span> <span class="p">)</span> <span class="p">]</span>
+<span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">setErrorCheckingChain</span><span class="p">(</span> <span class="n">errorchain</span> <span class="p">)</span>
+
+<span class="c"># a console tracer</span>
+<span class="n">observer</span><span class="o">=</span><span class="n">ConsoleCardConnectionObserver</span><span class="p">()</span>
+<span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">addObserver</span><span class="p">(</span> <span class="n">observer</span> <span class="p">)</span>
+
+<span class="c"># send a few apdus; exceptions will occur upon errors</span>
+<span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">SELECT</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0xA0</span><span class="p">,</span> <span class="mh">0xA4</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x02</span><span class="p">]</span>
+    <span class="n">DF_TELECOM</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x7F</span><span class="p">,</span> <span class="mh">0x10</span><span class="p">]</span>
+    <span class="n">apdu</span> <span class="o">=</span> <span class="n">SELECT</span><span class="o">+</span><span class="n">DF_TELECOM</span>
+    <span class="n">response</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span> <span class="o">=</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">transmit</span><span class="p">(</span> <span class="n">apdu</span> <span class="p">)</span>
+    <span class="k">if</span> <span class="n">sw1</span> <span class="o">==</span> <span class="mh">0x9F</span><span class="p">:</span>
+        <span class="n">GET_RESPONSE</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0XA0</span><span class="p">,</span> <span class="mh">0XC0</span><span class="p">,</span> <span class="mo">00</span><span class="p">,</span> <span class="mo">00</span> <span class="p">]</span>
+        <span class="n">apdu</span> <span class="o">=</span> <span class="n">GET_RESPONSE</span> <span class="o">+</span> <span class="p">[</span><span class="n">sw2</span><span class="p">]</span>
+        <span class="n">response</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span> <span class="o">=</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">transmit</span><span class="p">(</span> <span class="n">apdu</span> <span class="p">)</span>
+<span class="k">except</span> <span class="n">SWException</span><span class="p">,</span> <span class="n">e</span><span class="p">:</span>
+    <span class="k">print</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Executing the previous script on a SIM card will cause an output similar to:</p>
+<div class="highlight-python"><div class="highlight"><pre>connecting to SchlumbergerSema Reflex USB v.2 0
+&gt; A0 A4 00 00 02 7F 10
+&lt; [] 9F 1A
+&gt; A0 C0 00 00 1A
+&lt; 00 00 00 00 7F 10 02 00 00 00 00 00 0D 13 00 0A 04 00 83 8A 83 8A 00 01 00 00 90 0
+disconnecting from SchlumbergerSema Reflex USB v.2 0
+disconnecting from SchlumbergerSema Reflex USB v.2 0
+</pre></div>
+</div>
+<p>whereas executing the script on a non-SIM card will result in:</p>
+<div class="highlight-python"><div class="highlight"><pre>connecting to Utimaco CardManUSB 0
+&gt; A0 A4 00 00 02 7F 10
+&lt; [] 6E 0
+&#39;Status word exception: checking error - Class (CLA) not supported!&#39;
+disconnecting from Utimaco CardManUSB 0
+disconnecting from Utimaco CardManUSB 0
+</pre></div>
+</div>
+<p>To implement an error checking chain, create an <a class="reference external" href="http://pyscard.sourceforge.net/epydoc/smartcard.sw.ErrorCheckingChain.ErrorCheckingChain-class.html">ErrorCheckingChain</a>
+object with the desired error checking strategies, and set this chain
+object as the card connection error checking chain. The card connection
+will use the chain for error checking upon reception of a response apdu:</p>
+</div>
+<div class="section" id="writing-a-custom-error-checker">
+<h4>Writing a custom error checker<a class="headerlink" href="#writing-a-custom-error-checker" title="Permalink to this headline">¶</a></h4>
+<p>Implementing a custom error checker requires implementing a sub-class of
+<a class="reference external" href="http://pyscard.sourceforge.net/epydoc/smartcard.sw.op21_ErrorChecker.op21_ErrorChecker-class.html">op21_ErrorChecker</a>,
+and overriding the __call__ method. The following error checker raises a
+<a class="reference external" href="http://pyscard.sourceforge.net/epydoc/smartcard.sw.SWExceptions.SecurityRelatedException-class.html">SecurityRelatedException</a>
+exception when sw1=0x66 and sw2=0x00:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">smartcard.sw.ErrorChecker</span> <span class="kn">import</span> <span class="n">ErrorChecker</span>
+<span class="kn">from</span> <span class="nn">smartcard.sw.SWExceptions</span> <span class="kn">import</span> <span class="n">SecurityRelatedException</span>
+
+<span class="k">class</span> <span class="nc">MyErrorChecker</span><span class="p">(</span> <span class="n">ErrorChecker</span> <span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span> <span class="p">):</span>
+        <span class="k">if</span> <span class="mh">0x66</span><span class="o">==</span><span class="n">sw1</span> <span class="ow">and</span> <span class="mh">0x00</span><span class="o">==</span><span class="n">sw2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SecurityRelatedException</span><span class="p">(</span> <span class="n">data</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span> <span class="p">)</span>
+
+<span class="n">Custom</span> <span class="n">checkers</span> <span class="n">can</span> <span class="n">be</span> <span class="n">used</span> <span class="n">standalone</span><span class="p">,</span> <span class="k">as</span> <span class="ow">in</span> <span class="n">the</span> <span class="n">following</span> <span class="n">sample</span><span class="p">,</span> <span class="ow">or</span> <span class="n">chained</span> <span class="n">to</span> <span class="n">other</span> <span class="n">error</span> <span class="n">checkers</span><span class="p">:</span>
+
+<span class="kn">from</span> <span class="nn">smartcard.CardType</span> <span class="kn">import</span> <span class="n">AnyCardType</span>
+<span class="kn">from</span> <span class="nn">smartcard.CardRequest</span> <span class="kn">import</span> <span class="n">CardRequest</span>
+
+<span class="kn">from</span> <span class="nn">smartcard.sw.ErrorCheckingChain</span> <span class="kn">import</span> <span class="n">ErrorCheckingChain</span>
+<span class="kn">from</span> <span class="nn">smartcard.sw.ErrorChecker</span> <span class="kn">import</span> <span class="n">ErrorChecker</span>
+<span class="kn">from</span> <span class="nn">smartcard.sw.SWExceptions</span> <span class="kn">import</span> <span class="n">SecurityRelatedException</span>
+
+<span class="k">class</span> <span class="nc">MyErrorChecker</span><span class="p">(</span> <span class="n">ErrorChecker</span> <span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__call__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span> <span class="p">):</span>
+        <span class="k">if</span> <span class="mh">0x66</span><span class="o">==</span><span class="n">sw1</span> <span class="ow">and</span> <span class="mh">0x00</span><span class="o">==</span><span class="n">sw2</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SecurityRelatedException</span><span class="p">(</span> <span class="n">data</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span> <span class="p">)</span>
+
+<span class="c"># request any card</span>
+<span class="n">cardtype</span> <span class="o">=</span> <span class="n">AnyCardType</span><span class="p">()</span>
+<span class="n">cardrequest</span> <span class="o">=</span> <span class="n">CardRequest</span><span class="p">(</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">cardType</span><span class="o">=</span><span class="n">cardtype</span> <span class="p">)</span>
+<span class="n">cardservice</span> <span class="o">=</span> <span class="n">cardrequest</span><span class="o">.</span><span class="n">waitforcard</span><span class="p">()</span>
+
+<span class="c"># our error checking chain</span>
+<span class="n">errorchain</span><span class="o">=</span><span class="p">[]</span>
+<span class="n">errorchain</span><span class="o">=</span><span class="p">[</span> <span class="n">ErrorCheckingChain</span><span class="p">(</span> <span class="p">[],</span> <span class="n">MyErrorChecker</span><span class="p">()</span> <span class="p">)</span> <span class="p">]</span>
+<span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">setErrorCheckingChain</span><span class="p">(</span> <span class="n">errorchain</span> <span class="p">)</span>
+
+<span class="c"># send a few apdus; exceptions will occur upon errors</span>
+<span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+
+<span class="n">SELECT</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0xA0</span><span class="p">,</span> <span class="mh">0xA4</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x02</span><span class="p">]</span>
+<span class="n">DF_TELECOM</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x7F</span><span class="p">,</span> <span class="mh">0x10</span><span class="p">]</span>
+<span class="n">apdu</span> <span class="o">=</span> <span class="n">SELECT</span><span class="o">+</span><span class="n">DF_TELECOM</span>
+<span class="n">response</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span> <span class="o">=</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">transmit</span><span class="p">(</span> <span class="n">apdu</span> <span class="p">)</span>
+<span class="k">if</span> <span class="n">sw1</span> <span class="o">==</span> <span class="mh">0x9F</span><span class="p">:</span>
+    <span class="n">GET_RESPONSE</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0XA0</span><span class="p">,</span> <span class="mh">0XC0</span><span class="p">,</span> <span class="mo">00</span><span class="p">,</span> <span class="mo">00</span> <span class="p">]</span>
+    <span class="n">apdu</span> <span class="o">=</span> <span class="n">GET_RESPONSE</span> <span class="o">+</span> <span class="p">[</span><span class="n">sw2</span><span class="p">]</span>
+    <span class="n">response</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span> <span class="o">=</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">transmit</span><span class="p">(</span> <span class="n">apdu</span> <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="smartcard-readers">
+<h2>Smartcard readers<a class="headerlink" href="#smartcard-readers" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="listing-smartcard-readers">
+<h3>Listing Smartcard Readers<a class="headerlink" href="#listing-smartcard-readers" title="Permalink to this headline">¶</a></h3>
+<p>The easiest way to retrieve the list of smartcard readers is the
+smartcard.System.readers() function:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">smartcard.System</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">smartcard</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">readers</span><span class="p">()</span>
+<span class="go">[&#39;Schlumberger e-gate 0&#39;, &#39;SchlumbergerSema Reflex USB v.2 0&#39;, &#39;Utimaco CardManUSB 0&#39;]</span>
+<span class="go">&gt;&gt;&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="organizing-smartcard-readers-into-reader-groups">
+<h3>Organizing Smartcard Readers into reader groups<a class="headerlink" href="#organizing-smartcard-readers-into-reader-groups" title="Permalink to this headline">¶</a></h3>
+<p>Reader group management is only available on Windows, since PCSC-lite
+does not currently supports reader groups management.</p>
+<p>Readers can be organized in reader groups. To retrieve the smartcard
+reader groups, use readergroups():</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">smartcard.System</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">smartcard</span><span class="o">.</span><span class="n">System</span><span class="o">.</span><span class="n">readergroups</span><span class="p">()</span>
+<span class="go">[&#39;SCard$DefaultReaders&#39;]</span>
+<span class="go">&gt;&gt;&gt;</span>
+</pre></div>
+</div>
+<p>The readergroups() object has all the list attributes. To add a reader
+group, simply use the + operator, e.g.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.System</span> <span class="kn">import</span> <span class="n">readergroups</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="o">=</span><span class="n">readergroups</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">g</span>
+<span class="go">[&#39;SCard$DefaultReaders&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="o">+=</span><span class="s">&#39;Biometric$Readers&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">g</span>
+<span class="go">[&#39;SCard$DefaultReaders&#39;, &#39;Biometric$Readers&#39;]</span>
+<span class="go">&gt;&gt;&gt;</span>
+</pre></div>
+</div>
+<p>You can also use the append and insert methods, as well as the + operator, e.g.:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.System</span> <span class="kn">import</span> <span class="n">readergroups</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="o">=</span><span class="n">readergroups</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">g</span>
+<span class="go">[&#39;SCard$DefaultReaders&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="o">=</span><span class="n">g</span><span class="o">+</span><span class="p">[</span><span class="s">&#39;Biometric$Readers&#39;</span><span class="p">,</span><span class="s">&#39;Pinpad$Readers&#39;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">g</span>
+<span class="go">[&#39;SCard$DefaultReaders&#39;, &#39;Biometric$Readers&#39;, &#39;Pinpad$Readers&#39;]</span>
+<span class="go">&gt;&gt;&gt;</span>
+</pre></div>
+</div>
+<p>or</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.System</span> <span class="kn">import</span> <span class="n">readergroups</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="o">=</span><span class="n">readergroups</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">g</span>
+<span class="go">[&#39;SCard$DefaultReaders&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s">&#39;Biometric$Readers&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="s">&#39;Pinpad$Readers&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">g</span>
+<span class="go">[&#39;SCard$DefaultReaders&#39;, &#39;Pinpad$Readers&#39;, &#39;Biometric$Readers&#39;]</span>
+<span class="go">&gt;&gt;&gt;</span>
+</pre></div>
+</div>
+<p>Smartcard reader groups are not persistent until a reader as been added
+to the group. To add a reader to a reader group, use
+addreadertogroups():</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.System</span> <span class="kn">import</span> <span class="n">readergroups</span><span class="p">,</span> <span class="n">addreadertogroups</span><span class="p">,</span> <span class="n">readers</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="o">=</span><span class="n">readergroups</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="o">+=</span><span class="s">&#39;USB$Readers&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">addreadertogroups</span><span class="p">(</span> <span class="s">&#39;Schlumberger e-gate 0&#39;</span><span class="p">,</span> <span class="s">&#39;USB$Readers&#39;</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">readers</span><span class="p">(</span> <span class="s">&#39;USB$Readers&#39;</span><span class="p">)</span>
+<span class="go">[&#39;Schlumberger e-gate 0&#39;]</span>
+<span class="go">&gt;&gt;&gt;</span>
+</pre></div>
+</div>
+<p>To remove a reader group, all list operators are available to manage
+reader groups, including pop() or remove():</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.System</span> <span class="kn">import</span> <span class="n">readergroups</span><span class="p">,</span> <span class="n">addreadertogroups</span><span class="p">,</span> <span class="n">readers</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="o">=</span><span class="n">readergroups</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="o">+=</span><span class="s">&#39;USB$Readers&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">g</span>
+<span class="go">[&#39;SCard$DefaultReaders&#39;, &#39;USB$Readers&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="go">&#39;USB$Readers&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span>
+<span class="go">[&#39;SCard$DefaultReaders&#39;]</span>
+<span class="go">&gt;&gt;&gt;</span>
+</pre></div>
+</div>
+<p>or</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.System</span> <span class="kn">import</span> <span class="n">readergroups</span><span class="p">,</span> <span class="n">addreadertogroups</span><span class="p">,</span> <span class="n">readers</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="o">=</span><span class="n">readergroups</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">g</span><span class="o">+=</span><span class="s">&#39;USB$Readers&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">g</span>
+<span class="go">[&#39;SCard$DefaultReaders&#39;, &#39;USB$Readers&#39;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">readergroups</span><span class="p">()</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s">&#39;USB$Readers&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">readergroups</span><span class="p">()</span>
+<span class="go">[&#39;SCard$DefaultReaders&#39;]</span>
+<span class="go">&gt;&gt;&gt;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="monitoring-readers">
+<h3>Monitoring readers<a class="headerlink" href="#monitoring-readers" title="Permalink to this headline">¶</a></h3>
+<p>You can monitor the insertion or removal of readers using the
+<a class="reference external" href="http://pyscard.sourceforge.net/epydoc/smartcard.ReaderMonitoring.ReaderObserver-class.html">ReaderObserver</a>
+interface.</p>
+<p>To monitor reader insertion, create a <a class="reference external" href="http://pyscard.sourceforge.net/epydoc/smartcard.ReaderMonitoring.ReaderObserver-class.html">ReaderObserver</a>
+object that implements an update() method that will be called upon
+reader/insertion removal. The following sample code implements a
+ReaderObserver that simply prints the inserted/removed readers on the
+standard output:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">smartcard.ReaderMonitoring</span> <span class="kn">import</span> <span class="n">ReaderObserver</span>
+
+<span class="k">class</span> <span class="nc">printobserver</span><span class="p">(</span> <span class="n">ReaderObserver</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A simple reader observer that is notified</span>
+<span class="sd">    when readers are added/removed from the system and</span>
+<span class="sd">    prints the list of readers</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">observable</span><span class="p">,</span> <span class="p">(</span><span class="n">addedreaders</span><span class="p">,</span> <span class="n">removedreaders</span><span class="p">)</span> <span class="p">):</span>
+        <span class="k">print</span> <span class="s">&quot;Added readers&quot;</span><span class="p">,</span> <span class="n">addedreaders</span>
+        <span class="k">print</span> <span class="s">&quot;Removed readers&quot;</span><span class="p">,</span> <span class="n">removedreaders</span>
+</pre></div>
+</div>
+<p>To monitor reader insertion/removal, simply add the observer to the
+<a class="reference external" href="http://pyscard.sourceforge.net/epydoc/smartcard.ReaderMonitoring.ReaderMonitor-class.html">ReaderMonitor</a>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">sys</span> <span class="kn">import</span> <span class="n">stdin</span><span class="p">,</span> <span class="n">exc_info</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span>
+
+<span class="kn">from</span> <span class="nn">smartcard.ReaderMonitoring</span> <span class="kn">import</span> <span class="n">ReaderMonitor</span><span class="p">,</span> <span class="n">ReaderObserver</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s">&quot;Add or remove a smartcard reader to the system.&quot;</span>
+    <span class="k">print</span> <span class="s">&quot;This program will exit in 10 seconds&quot;</span>
+    <span class="k">print</span> <span class="s">&quot;&quot;</span>
+    <span class="n">readermonitor</span> <span class="o">=</span> <span class="n">ReaderMonitor</span><span class="p">()</span>
+    <span class="n">readerobserver</span> <span class="o">=</span> <span class="n">printobserver</span><span class="p">()</span>
+    <span class="n">readermonitor</span><span class="o">.</span><span class="n">addObserver</span><span class="p">(</span> <span class="n">readerobserver</span> <span class="p">)</span>
+
+    <span class="n">sleep</span><span class="p">(</span><span class="mi">10</span><span class="p">)</span>
+
+    <span class="c"># don&#39;t forget to remove observer, or the</span>
+    <span class="c"># monitor will poll forever...</span>
+    <span class="n">readermonitor</span><span class="o">.</span><span class="n">deleteObserver</span><span class="p">(</span><span class="n">readerobserver</span><span class="p">)</span>
+
+    <span class="k">print</span> <span class="s">&#39;press Enter to continue&#39;</span>
+    <span class="n">stdin</span><span class="o">.</span><span class="n">readline</span><span class="p">()</span>
+
+<span class="k">except</span> <span class="n">error</span><span class="p">:</span>
+    <span class="k">print</span> <span class="n">exc_info</span><span class="p">()[</span><span class="mi">0</span><span class="p">],</span> <span class="s">&#39;: &#39;</span><span class="p">,</span> <span class="n">exc_info</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="id5">
+<h2>Smart Cards<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="monitoring-smart-cards">
+<h3>Monitoring Smart Cards<a class="headerlink" href="#monitoring-smart-cards" title="Permalink to this headline">¶</a></h3>
+<p>You can monitor the insertion or removal of cards using the
+<a class="reference external" href="http://pyscard.sourceforge.net/epydoc/smartcard.CardMonitoring.CardObserver-class.html">CardObserver</a>
+interface.</p>
+<p>To monitor card insertion and removal, create a <a class="reference external" href="http://pyscard.sourceforge.net/epydoc/smartcard.CardMonitoring.CardObserver-class.html">CardObserver</a>
+object that implements an update() method that will be called upon card
+insertion/removal. The following sample code implements a CardObserver
+that simply prints the inserted/removed cards on the standard output,
+named printobserver. To monitor card insertion/removal, simply add the
+card observer to the <a class="reference external" href="http://pyscard.sourceforge.net/epydoc/smartcard.CardMonitoring.CardMonitor-class.html">CardMonitor</a>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">smartcard.CardMonitoring</span> <span class="kn">import</span> <span class="n">CardMonitor</span><span class="p">,</span> <span class="n">CardObserver</span>
+<span class="kn">from</span> <span class="nn">smartcard.util</span> <span class="kn">import</span> <span class="o">*</span>
+
+<span class="c"># a simple card observer that prints inserted/removed cards</span>
+<span class="k">class</span> <span class="nc">printobserver</span><span class="p">(</span> <span class="n">CardObserver</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A simple card observer that is notified</span>
+<span class="sd">    when cards are inserted/removed from the system and</span>
+<span class="sd">    prints the list of cards</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">observable</span><span class="p">,</span> <span class="p">(</span><span class="n">addedcards</span><span class="p">,</span> <span class="n">removedcards</span><span class="p">)</span> <span class="p">):</span>
+        <span class="k">for</span> <span class="n">card</span> <span class="ow">in</span> <span class="n">addedcards</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;+Inserted: &quot;</span><span class="p">,</span> <span class="n">toHexString</span><span class="p">(</span> <span class="n">card</span><span class="o">.</span><span class="n">atr</span> <span class="p">)</span>
+        <span class="k">for</span> <span class="n">card</span> <span class="ow">in</span> <span class="n">removedcards</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;-Removed: &quot;</span><span class="p">,</span> <span class="n">toHexString</span><span class="p">(</span> <span class="n">card</span><span class="o">.</span><span class="n">atr</span> <span class="p">)</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="k">print</span> <span class="s">&quot;Insert or remove a smartcard in the system.&quot;</span>
+    <span class="k">print</span> <span class="s">&quot;This program will exit in 10 seconds&quot;</span>
+    <span class="k">print</span> <span class="s">&quot;&quot;</span>
+    <span class="n">cardmonitor</span> <span class="o">=</span> <span class="n">CardMonitor</span><span class="p">()</span>
+    <span class="n">cardobserver</span> <span class="o">=</span> <span class="n">printobserver</span><span class="p">()</span>
+    <span class="n">cardmonitor</span><span class="o">.</span><span class="n">addObserver</span><span class="p">(</span> <span class="n">cardobserver</span> <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="sending-apdus-to-a-smart-card-obtained-from-card-monitoring">
+<h3>Sending APDUs to a Smart Card Obtained from Card Monitoring<a class="headerlink" href="#sending-apdus-to-a-smart-card-obtained-from-card-monitoring" title="Permalink to this headline">¶</a></h3>
+<p>The update method of the CardObserver receives two lists of Cards
+objects, the recently added cards and the recently removed cards. A
+connection can be created to each Card object of the added card list for
+sending APDUS.</p>
+<p>The following sample code implements a CardObserver class named
+transmitobserver, that connects to inserted cards and transmit an APDU,
+in our case SELECT DF_TELECOM:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># a card observer that connects to new cards and performs a transaction, e.g. SELECT DF_TELECOM</span>
+<span class="k">class</span> <span class="nc">transmitobserver</span><span class="p">(</span> <span class="n">CardObserver</span> <span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A card observer that is notified when cards are inserted/removed from the system,</span>
+<span class="sd">    connects to cards and SELECT DF_TELECOM</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">cards</span><span class="o">=</span><span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">observable</span><span class="p">,</span> <span class="p">(</span><span class="n">addedcards</span><span class="p">,</span> <span class="n">removedcards</span><span class="p">)</span> <span class="p">):</span>
+        <span class="k">for</span> <span class="n">card</span> <span class="ow">in</span> <span class="n">addedcards</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">card</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cards</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cards</span><span class="o">+=</span><span class="p">[</span><span class="n">card</span><span class="p">]</span>
+                <span class="k">print</span> <span class="s">&quot;+Inserted: &quot;</span><span class="p">,</span> <span class="n">toHexString</span><span class="p">(</span> <span class="n">card</span><span class="o">.</span><span class="n">atr</span> <span class="p">)</span>
+                <span class="n">card</span><span class="o">.</span><span class="n">connection</span> <span class="o">=</span> <span class="n">card</span><span class="o">.</span><span class="n">createConnection</span><span class="p">()</span>
+                <span class="n">card</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+                <span class="n">response</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span> <span class="o">=</span> <span class="n">card</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">transmit</span><span class="p">(</span> <span class="n">SELECT_DF_TELECOM</span> <span class="p">)</span>
+                <span class="k">print</span> <span class="s">&quot;</span><span class="si">%.2x</span><span class="s"> </span><span class="si">%.2x</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">card</span> <span class="ow">in</span> <span class="n">removedcards</span><span class="p">:</span>
+            <span class="k">print</span> <span class="s">&quot;-Removed: &quot;</span><span class="p">,</span> <span class="n">toHexString</span><span class="p">(</span> <span class="n">card</span><span class="o">.</span><span class="n">atr</span> <span class="p">)</span>
+            <span class="k">if</span> <span class="n">card</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">cards</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">cards</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span> <span class="n">card</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>To monitor card insertion, connect to inserted cards and send the APDU,
+create an instance of transmitobserver and add it to the <a class="reference external" href="http://pyscard.sourceforge.net/epydoc/smartcard.CardMonitoring.CardMonitor-class.html">CardMonitor</a>:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span>
+<span class="k">print</span> <span class="s">&quot;Insert or remove a smartcard in the system.&quot;</span>
+<span class="k">print</span> <span class="s">&quot;This program will exit in 100 seconds&quot;</span>
+<span class="k">print</span> <span class="s">&quot;&quot;</span>
+<span class="n">cardmonitor</span> <span class="o">=</span> <span class="n">CardMonitor</span><span class="p">()</span>
+<span class="n">cardobserver</span> <span class="o">=</span> <span class="n">transmitobserver</span><span class="p">()</span>
+<span class="n">cardmonitor</span><span class="o">.</span><span class="n">addObserver</span><span class="p">(</span> <span class="n">cardobserver</span> <span class="p">)</span>
+
+<span class="n">sleep</span><span class="p">(</span><span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="connections">
+<h2>Connections<a class="headerlink" href="#connections" title="Permalink to this headline">¶</a></h2>
+<p>Connecting to a card and sending APDUs is done thru a CardConnection
+object. CardConnection objects are created using a CardRequest, or by
+the CardMonitoring.</p>
+<div class="section" id="creating-a-connection-from-a-cardrequest">
+<h3>Creating a Connection from a CardRequest<a class="headerlink" href="#creating-a-connection-from-a-cardrequest" title="Permalink to this headline">¶</a></h3>
+<p>A successful CardRequest returns a CardService matching the requested
+card service for the card, or a PassThruCardService if no specific card
+service was required:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.CardType</span> <span class="kn">import</span> <span class="n">AnyCardType</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.CardRequest</span> <span class="kn">import</span> <span class="n">CardRequest</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">smartcard.util</span> <span class="kn">import</span> <span class="n">toHexString</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardtype</span> <span class="o">=</span> <span class="n">AnyCardType</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardrequest</span> <span class="o">=</span> <span class="n">CardRequest</span><span class="p">(</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">cardType</span><span class="o">=</span><span class="n">cardtype</span> <span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardservice</span> <span class="o">=</span> <span class="n">cardrequest</span><span class="o">.</span><span class="n">waitforcard</span><span class="p">()</span>
+<span class="go">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">toHexString</span><span class="p">(</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">getATR</span><span class="p">()</span> <span class="p">)</span>
+<span class="go">3B 16 94 20 02 01 00 00 0D</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">print</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">getReader</span><span class="p">()</span>
+<span class="go">SchlumbergerSema Reflex USB v.2 0</span>
+</pre></div>
+</div>
+<p>Each CardService has a connection attribute, which is a CardConnection
+for the card.</p>
+</div>
+<div class="section" id="creating-connection-from-cardmonitoring">
+<h3>Creating Connection from CardMonitoring<a class="headerlink" href="#creating-connection-from-cardmonitoring" title="Permalink to this headline">¶</a></h3>
+<p>The <a class="reference external" href="http://pyscard.sourceforge.net/pyscard-usersguide.html#monitoringsmartcards">update</a>
+method of a CardObserver receives a tuple with a list of connected cards
+and a list of removed cards. To create a CardConnection from a card
+object, use the createConnection() method of the desired card:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">myobserver</span><span class="p">(</span> <span class="n">CardObserver</span> <span class="p">):</span>
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">observable</span><span class="p">,</span> <span class="p">(</span><span class="n">addedcards</span><span class="p">,</span> <span class="n">removedcards</span><span class="p">)</span> <span class="p">):</span>
+        <span class="k">for</span> <span class="n">card</span> <span class="ow">in</span> <span class="n">addedcards</span><span class="p">:</span>
+                <span class="k">print</span> <span class="s">&quot;+Inserted: &quot;</span><span class="p">,</span> <span class="n">toHexString</span><span class="p">(</span> <span class="n">card</span><span class="o">.</span><span class="n">atr</span> <span class="p">)</span>
+                <span class="n">card</span><span class="o">.</span><span class="n">connection</span> <span class="o">=</span> <span class="n">card</span><span class="o">.</span><span class="n">createConnection</span><span class="p">()</span>
+                <span class="n">card</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+                <span class="n">response</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span> <span class="o">=</span> <span class="n">card</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">transmit</span><span class="p">(</span> <span class="n">SELECT_DF_TELECOM</span> <span class="p">)</span>
+                <span class="k">print</span> <span class="s">&quot;</span><span class="si">%.2x</span><span class="s"> </span><span class="si">%.2x</span><span class="s">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="card-connection-decorators">
+<h3>Card Connection Decorators<a class="headerlink" href="#card-connection-decorators" title="Permalink to this headline">¶</a></h3>
+<p>APDUs are transmitted to a card using the CardConnection object. It is
+sometime useful to change transparently the behaviour of a smart card
+connection, for example to establish automatically a secure channel, or
+filter and modify on the fly some APDU commands or responses, or the
+smart card ATR. pyscard uses theDecorator design pattern to dynamically
+change the behaviour of a smart card connection. A
+CardConnectionDecorator modifies the behaviour of a CardConnection
+object. For example, the following CardConnectionDecorator overwrites
+the CardConnection getATR() method:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">FakeATRConnection</span><span class="p">(</span> <span class="n">CardConnectionDecorator</span> <span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;This decorator changes the fist byte of the ATR.&#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">cardconnection</span> <span class="p">):</span>
+        <span class="n">CardConnectionDecorator</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">cardconnection</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">getATR</span><span class="p">(</span> <span class="bp">self</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Replace first BYTE of ATR by 3F&quot;&quot;&quot;</span>
+        <span class="n">atr</span> <span class="o">=</span> <span class="n">CardConnectionDecorator</span><span class="o">.</span><span class="n">getATR</span><span class="p">(</span> <span class="bp">self</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="p">[</span> <span class="mh">0x3f</span> <span class="p">]</span> <span class="o">+</span> <span class="n">atr</span> <span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+</pre></div>
+</div>
+<p>To apply the decorator, just construct the decorator around the
+CardConnection instance to wrap and use the decorator in place of the
+card connection object:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># request any card type</span>
+<span class="n">cardtype</span> <span class="o">=</span> <span class="n">AnyCardType</span><span class="p">()</span>
+<span class="n">cardrequest</span> <span class="o">=</span> <span class="n">CardRequest</span><span class="p">(</span> <span class="n">timeout</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span> <span class="n">cardType</span><span class="o">=</span><span class="n">cardtype</span> <span class="p">)</span>
+<span class="n">cardservice</span> <span class="o">=</span> <span class="n">cardrequest</span><span class="o">.</span><span class="n">waitforcard</span><span class="p">()</span>
+
+<span class="c"># attach the console tracer</span>
+<span class="n">observer</span><span class="o">=</span><span class="n">ConsoleCardConnectionObserver</span><span class="p">()</span>
+<span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">addObserver</span><span class="p">(</span> <span class="n">observer</span> <span class="p">)</span>
+
+<span class="c"># attach our decorator</span>
+<span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span> <span class="o">=</span> <span class="n">FakeATRConnection</span><span class="p">(</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span> <span class="p">)</span>
+
+<span class="c"># connect to the card and perform a few transmits</span>
+<span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+
+<span class="k">print</span> <span class="s">&#39;ATR&#39;</span><span class="p">,</span> <span class="n">toHexString</span><span class="p">(</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">getATR</span><span class="p">()</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>Decorators can be nested. For example to nest a FakeATRConnection with a
+SecureChannelConnection, use the following construction:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="c"># attach our decorator</span>
+<span class="n">FakeATRConnection</span><span class="p">(</span> <span class="n">SecureChannelConnection</span><span class="p">(</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span> <span class="p">)</span> <span class="p">)</span>
+
+<span class="c"># connect to the card and perform a few transmits</span>
+<span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+
+<span class="k">print</span> <span class="s">&#39;ATR&#39;</span><span class="p">,</span> <span class="n">toHexString</span><span class="p">(</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">getATR</span><span class="p">()</span> <span class="p">)</span>
+</pre></div>
+</div>
+<div class="section" id="exclusive-card-connection-decorator">
+<h4>Exclusive Card Connection Decorator<a class="headerlink" href="#exclusive-card-connection-decorator" title="Permalink to this headline">¶</a></h4>
+<p>The ExclusiveConnectCardConnection object performs an exclusive
+connection to the card, i.e. no other thread or process will be able to
+connect to the card. With PCSC readers, this is done by performing a
+SCardConnect with the SCARD_SHARE_EXCLUSIVE attribute.</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">smartcard.CardType</span> <span class="kn">import</span> <span class="n">AnyCardType</span>
+<span class="kn">from</span> <span class="nn">smartcard.CardRequest</span> <span class="kn">import</span> <span class="n">CardRequest</span>
+<span class="kn">from</span> <span class="nn">smartcard.CardConnection</span> <span class="kn">import</span> <span class="n">CardConnection</span>
+<span class="kn">from</span> <span class="nn">smartcard.util</span> <span class="kn">import</span> <span class="n">toHexString</span>
+
+<span class="kn">from</span> <span class="nn">smartcard.ExclusiveConnectCardConnection</span> <span class="kn">import</span> <span class="n">ExclusiveConnectCardConnection</span>
+
+<span class="c"># request any card type</span>
+<span class="n">cardtype</span> <span class="o">=</span> <span class="n">AnyCardType</span><span class="p">()</span>
+<span class="n">cardrequest</span> <span class="o">=</span> <span class="n">CardRequest</span><span class="p">(</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">cardType</span><span class="o">=</span><span class="n">cardtype</span> <span class="p">)</span>
+<span class="n">cardservice</span> <span class="o">=</span> <span class="n">cardrequest</span><span class="o">.</span><span class="n">waitforcard</span><span class="p">()</span>
+
+<span class="c"># attach our decorator</span>
+<span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span> <span class="o">=</span> <span class="n">ExclusiveConnectCardConnection</span><span class="p">(</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span> <span class="p">)</span>
+
+<span class="c"># connect to the card and perform a few transmits</span>
+<span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+
+<span class="k">print</span> <span class="s">&#39;ATR&#39;</span><span class="p">,</span> <span class="n">toHexString</span><span class="p">(</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">getATR</span><span class="p">()</span> <span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="exclusive-transmit-card-connection-decorator">
+<h4>Exclusive Transmit Card Connection Decorator<a class="headerlink" href="#exclusive-transmit-card-connection-decorator" title="Permalink to this headline">¶</a></h4>
+<p>The ExclusiveTransmitCardConnection performs an exclusive transaction to
+the card, i.e. a series of transmit that cannot be interupted by other
+threads&#8217; transmits. To do so, include the desired transmits between an
+lock() and unlock() method call on the ExclusiveTransmitCardConnection:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">smartcard.CardType</span> <span class="kn">import</span> <span class="n">AnyCardType</span>
+<span class="kn">from</span> <span class="nn">smartcard.CardRequest</span> <span class="kn">import</span> <span class="n">CardRequest</span>
+<span class="kn">from</span> <span class="nn">smartcard.CardConnectionObserver</span> <span class="kn">import</span> <span class="n">ConsoleCardConnectionObserver</span>
+<span class="kn">from</span> <span class="nn">smartcard.CardConnection</span> <span class="kn">import</span> <span class="n">CardConnection</span>
+<span class="kn">from</span> <span class="nn">smartcard.util</span> <span class="kn">import</span> <span class="n">toHexString</span>
+
+<span class="kn">from</span> <span class="nn">smartcard.ExclusiveTransmitCardConnection</span> <span class="kn">import</span> <span class="n">ExclusiveTransmitCardConnection</span>
+
+
+<span class="c"># define the apdus used in this script</span>
+<span class="n">GET_RESPONSE</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0XA0</span><span class="p">,</span> <span class="mh">0XC0</span><span class="p">,</span> <span class="mo">00</span><span class="p">,</span> <span class="mo">00</span> <span class="p">]</span>
+<span class="n">SELECT</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0xA0</span><span class="p">,</span> <span class="mh">0xA4</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x00</span><span class="p">,</span> <span class="mh">0x02</span><span class="p">]</span>
+<span class="n">DF_TELECOM</span> <span class="o">=</span> <span class="p">[</span><span class="mh">0x7F</span><span class="p">,</span> <span class="mh">0x10</span><span class="p">]</span>
+
+<span class="c"># request any card type</span>
+<span class="n">cardtype</span> <span class="o">=</span> <span class="n">AnyCardType</span><span class="p">()</span>
+<span class="n">cardrequest</span> <span class="o">=</span> <span class="n">CardRequest</span><span class="p">(</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">cardType</span><span class="o">=</span><span class="n">cardtype</span> <span class="p">)</span>
+<span class="n">cardservice</span> <span class="o">=</span> <span class="n">cardrequest</span><span class="o">.</span><span class="n">waitforcard</span><span class="p">()</span>
+
+<span class="c"># attach the console tracer</span>
+<span class="n">observer</span><span class="o">=</span><span class="n">ConsoleCardConnectionObserver</span><span class="p">()</span>
+<span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">addObserver</span><span class="p">(</span> <span class="n">observer</span> <span class="p">)</span>
+
+<span class="c"># attach our decorator</span>
+<span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span> <span class="o">=</span> <span class="n">ExclusiveTransmitCardConnection</span><span class="p">(</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span> <span class="p">)</span>
+
+<span class="c"># connect to the card and perform a few transmits</span>
+<span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">connect</span><span class="p">()</span>
+
+<span class="k">print</span> <span class="s">&#39;ATR&#39;</span><span class="p">,</span> <span class="n">toHexString</span><span class="p">(</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">getATR</span><span class="p">()</span> <span class="p">)</span>
+
+<span class="k">try</span><span class="p">:</span>
+    <span class="c"># lock for initiating transaction</span>
+    <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">lock</span><span class="p">()</span>
+
+    <span class="n">apdu</span> <span class="o">=</span> <span class="n">SELECT</span><span class="o">+</span><span class="n">DF_TELECOM</span>
+    <span class="n">response</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span> <span class="o">=</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">transmit</span><span class="p">(</span> <span class="n">apdu</span> <span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">sw1</span> <span class="o">==</span> <span class="mh">0x9F</span><span class="p">:</span>
+        <span class="n">apdu</span> <span class="o">=</span> <span class="n">GET_RESPONSE</span> <span class="o">+</span> <span class="p">[</span><span class="n">sw2</span><span class="p">]</span>
+        <span class="n">response</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span> <span class="o">=</span> <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">transmit</span><span class="p">(</span> <span class="n">apdu</span> <span class="p">)</span>
+<span class="k">finally</span><span class="p">:</span>
+    <span class="c"># unlock connection at the end of the transaction</span>
+    <span class="n">cardservice</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">unlock</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="secure-channel-card-connection-decorator">
+<h4>Secure Channel Card Connection Decorator<a class="headerlink" href="#secure-channel-card-connection-decorator" title="Permalink to this headline">¶</a></h4>
+<p>Another sample of application of CardConnection decorators is to
+implement secure channel. The following sample is a template
+CardConnection decorator for secure channel, where each command APDU is
+cyphered and each response APDU is uncyphered:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="k">class</span> <span class="nc">SecureChannelConnection</span><span class="p">(</span> <span class="n">CardConnectionDecorator</span> <span class="p">):</span>
+    <span class="sd">&#39;&#39;&#39;This decorator is a mockup of secure channel connection.</span>
+<span class="sd">    It merely pretends to cypher/uncypher upon apdu transmission.&#39;&#39;&#39;</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">cardconnection</span> <span class="p">):</span>
+        <span class="n">CardConnectionDecorator</span><span class="o">.</span><span class="n">__init__</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">cardconnection</span> <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">cypher</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="nb">bytes</span> <span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Cypher mock-up; you would include the secure channel logics here.&#39;&#39;&#39;</span>
+        <span class="k">print</span> <span class="s">&#39;cyphering&#39;</span><span class="p">,</span> <span class="n">toHexString</span><span class="p">(</span> <span class="nb">bytes</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="nb">bytes</span>
+
+    <span class="k">def</span> <span class="nf">uncypher</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">data</span> <span class="p">):</span>
+        <span class="sd">&#39;&#39;&#39;Uncypher mock-up; you would include the secure channel logics here.&#39;&#39;&#39;</span>
+        <span class="k">print</span> <span class="s">&#39;uncyphering&#39;</span><span class="p">,</span> <span class="n">toHexString</span><span class="p">(</span> <span class="n">data</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="n">data</span>
+
+    <span class="k">def</span> <span class="nf">transmit</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">protocol</span><span class="o">=</span><span class="bp">None</span> <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Cypher/uncypher APDUs before transmission&quot;&quot;&quot;</span>
+        <span class="n">cypheredbytes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">cypher</span><span class="p">(</span> <span class="nb">bytes</span> <span class="p">)</span>
+        <span class="n">data</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span> <span class="o">=</span> <span class="n">CardConnectionDecorator</span><span class="o">.</span><span class="n">transmit</span><span class="p">(</span> <span class="bp">self</span><span class="p">,</span> <span class="n">cypheredbytes</span><span class="p">,</span> <span class="n">protocol</span> <span class="p">)</span>
+        <span class="k">if</span> <span class="p">[]</span><span class="o">!=</span><span class="n">data</span><span class="p">:</span>
+            <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">uncypher</span><span class="p">(</span> <span class="n">data</span> <span class="p">)</span>
+        <span class="k">return</span> <span class="n">data</span><span class="p">,</span> <span class="n">sw1</span><span class="p">,</span> <span class="n">sw2</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="a-word-on-cryptography">
+<h2>A word on cryptography<a class="headerlink" href="#a-word-on-cryptography" title="Permalink to this headline">¶</a></h2>
+<p>Smart card are security devices. As a result, smart card applications
+usually require some kind cryptography, for example to establish a
+secure channel with the smart card. One of the reference cryptographic
+modules for python is <a class="reference external" href="http://www.amk.ca/python/code/crypto.html">pycrypto</a>, the python cryptographic
+toolkit. This section shows briefly the basics of pycrypto to give you a
+quick start to include cryptography in you python smart card
+applications.</p>
+<div class="section" id="bynary-strings-and-list-of-bytes">
+<h3>Bynary strings and list of bytes<a class="headerlink" href="#bynary-strings-and-list-of-bytes" title="Permalink to this headline">¶</a></h3>
+<p>pycrypto processes binary strings, i.e. python strings that contains
+characters such as &#8216;01427023&#8217;, whereas pyscard processes APDUs as
+list of bytes such as [0x01, 0x42, 0x70, 0x23]. The utility function
+HexListToBinString and BinStringToHexList (and their short name versions
+hl2bs and bs2hl) provide conversion between the two types.</p>
+<div class="highlight-python"><div class="highlight"><pre>from smartcard.util import HexListToBinString, BinStringToHexList
+test_data = [ 0x01, 0x42, 0x70, 0x23 ]
+binstring = HexListToBinString( test_data )
+hexlist = BinStringToHexList( binstring )
+print binstring, hexlist
+?Bp# [1, 66, 112, 35]
+Hashing
+</pre></div>
+</div>
+<p>pycrypto supports the following hashing algorithms: SHA-1, MD2, MD4 et
+MD5. To hash 16 bytes of data with SHA-1:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">Crypto.Hash</span> <span class="kn">import</span> <span class="n">SHA</span>
+
+<span class="kn">from</span> <span class="nn">smartcard.util</span> <span class="kn">import</span> <span class="n">toHexString</span><span class="p">,</span> <span class="n">PACK</span>
+
+<span class="n">test_data</span> <span class="o">=</span> <span class="p">[</span> <span class="mh">0x01</span><span class="p">,</span> <span class="mh">0x42</span><span class="p">,</span> <span class="mh">0x70</span><span class="p">,</span> <span class="mh">0x23</span> <span class="p">]</span>
+<span class="n">binstring</span> <span class="o">=</span> <span class="n">HexListToBinString</span><span class="p">(</span> <span class="n">test_data</span> <span class="p">)</span>
+
+<span class="n">zhash</span> <span class="o">=</span> <span class="n">SHA</span><span class="o">.</span><span class="n">new</span><span class="p">(</span> <span class="n">binstring</span> <span class="p">)</span>
+<span class="n">hash_as_string</span> <span class="o">=</span> <span class="n">zhash</span><span class="o">.</span><span class="n">digest</span><span class="p">()[:</span><span class="mi">16</span><span class="p">]</span>
+<span class="n">hash_as_bytes</span> <span class="o">=</span> <span class="n">BinStringToHexList</span><span class="p">(</span> <span class="n">hash_as_string</span> <span class="p">)</span>
+<span class="k">print</span> <span class="n">hash_as_string</span><span class="p">,</span> <span class="s">&#39;,&#39;</span><span class="p">,</span> <span class="n">toHexString</span><span class="p">(</span> <span class="n">hash_as_bytes</span><span class="p">,</span> <span class="n">PACK</span> <span class="p">)</span>
+</pre></div>
+</div>
+<p>To perform MD5 hashing, just replace SHA by MD5 in the previous script.</p>
+</div>
+<div class="section" id="secret-key-cryptography">
+<h3>Secret key cryptography<a class="headerlink" href="#secret-key-cryptography" title="Permalink to this headline">¶</a></h3>
+<p>pycrypto supports several secret key algorithms, such as DES, triple
+DES, AES, blowfish, or IDEA. To perform triple DES ciphering in ECB
+mode:</p>
+<div class="highlight-python"><div class="highlight"><pre><span class="kn">from</span> <span class="nn">Crypto.Cipher</span> <span class="kn">import</span> <span class="n">DES3</span>
+
+<span class="kn">from</span> <span class="nn">smartcard.util</span> <span class="kn">import</span> <span class="n">toBytes</span>
+
+<span class="n">key</span> <span class="o">=</span> <span class="s">&quot;31323334353637383132333435363738&quot;</span>
+<span class="n">key_as_binstring</span> <span class="o">=</span> <span class="n">HexListToBinString</span><span class="p">(</span> <span class="n">toBytes</span><span class="p">(</span> <span class="n">key</span> <span class="p">)</span> <span class="p">)</span>
+<span class="n">zdes</span> <span class="o">=</span> <span class="n">DES3</span><span class="o">.</span><span class="n">new</span><span class="p">(</span> <span class="n">key_as_binstring</span><span class="p">,</span> <span class="n">DES3</span><span class="o">.</span><span class="n">MODE_ECB</span> <span class="p">)</span>
+
+<span class="n">message</span> <span class="o">=</span> <span class="s">&quot;71727374757677787172737475767778&quot;</span>
+<span class="n">message_as_binstring</span> <span class="o">=</span> <span class="n">HexListToBinString</span><span class="p">(</span> <span class="n">toBytes</span><span class="p">(</span> <span class="n">message</span> <span class="p">)</span> <span class="p">)</span>
+
+<span class="n">encrypted_as_string</span> <span class="o">=</span> <span class="n">zdes</span><span class="o">.</span><span class="n">encrypt</span><span class="p">(</span> <span class="n">message_as_binstring</span> <span class="p">)</span>
+<span class="n">decrypted_as_string</span> <span class="o">=</span> <span class="n">zdes</span><span class="o">.</span><span class="n">decrypt</span><span class="p">(</span> <span class="n">encrypted_as_string</span> <span class="p">)</span>
+<span class="k">print</span> <span class="n">message_as_binstring</span><span class="p">,</span> <span class="n">encrypted_as_string</span><span class="p">,</span> <span class="n">decrypted_as_string</span>
+</pre></div>
+</div>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">pyscard user&#8217;s guide</a><ul>
+<li><a class="reference internal" href="#copyright">Copyright</a></li>
+<li><a class="reference internal" href="#introduction">Introduction</a></li>
+<li><a class="reference internal" href="#smart-cards">Smart Cards</a></li>
+<li><a class="reference internal" href="#quick-start">Quick-start</a><ul>
+<li><a class="reference internal" href="#the-reader-centric-approach">The reader-centric approach</a></li>
+<li><a class="reference internal" href="#the-answer-to-reset-atr">The Answer To Reset (ATR)</a></li>
+<li><a class="reference internal" href="#the-card-centric-approach">The card-centric approach</a><ul>
+<li><a class="reference internal" href="#requesting-a-card-by-atr">Requesting a card by ATR</a></li>
+<li><a class="reference internal" href="#requesting-any-card">Requesting any card</a></li>
+<li><a class="reference internal" href="#custom-cardtypes">Custom CardTypes</a></li>
+<li><a class="reference internal" href="#selecting-the-card-communication-protocol">Selecting the card communication protocol</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#the-object-centric-approach">The object-centric approach</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#tracing-apdus">Tracing APDUs</a><ul>
+<li><a class="reference internal" href="#the-brute-force">The brute force</a></li>
+<li><a class="reference internal" href="#using-card-connection-observers-to-trace-apdu-transmission">Using card connection observers to trace apdu transmission</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#testing-for-apdu-transmission-errors">Testing for APDU transmission errors</a><ul>
+<li><a class="reference internal" href="#the-brute-force-for-testing-apdu-transmission-errors">The brute force for testing APDU transmission errors</a></li>
+<li><a class="reference internal" href="#checking-apdu-transmission-errors-with-error-checkers">Checking APDU transmission errors with error checkers</a><ul>
+<li><a class="reference internal" href="#error-checkers">Error checkers</a></li>
+<li><a class="reference internal" href="#error-checking-chains">Error checking chains</a></li>
+<li><a class="reference internal" href="#filtering-exceptions">Filtering exceptions</a></li>
+<li><a class="reference internal" href="#detecting-response-apdu-errors-for-a-card-connection">Detecting response APDU errors for a card connection</a></li>
+<li><a class="reference internal" href="#writing-a-custom-error-checker">Writing a custom error checker</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#smartcard-readers">Smartcard readers</a><ul>
+<li><a class="reference internal" href="#listing-smartcard-readers">Listing Smartcard Readers</a></li>
+<li><a class="reference internal" href="#organizing-smartcard-readers-into-reader-groups">Organizing Smartcard Readers into reader groups</a></li>
+<li><a class="reference internal" href="#monitoring-readers">Monitoring readers</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#id5">Smart Cards</a><ul>
+<li><a class="reference internal" href="#monitoring-smart-cards">Monitoring Smart Cards</a></li>
+<li><a class="reference internal" href="#sending-apdus-to-a-smart-card-obtained-from-card-monitoring">Sending APDUs to a Smart Card Obtained from Card Monitoring</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#connections">Connections</a><ul>
+<li><a class="reference internal" href="#creating-a-connection-from-a-cardrequest">Creating a Connection from a CardRequest</a></li>
+<li><a class="reference internal" href="#creating-connection-from-cardmonitoring">Creating Connection from CardMonitoring</a></li>
+<li><a class="reference internal" href="#card-connection-decorators">Card Connection Decorators</a><ul>
+<li><a class="reference internal" href="#exclusive-card-connection-decorator">Exclusive Card Connection Decorator</a></li>
+<li><a class="reference internal" href="#exclusive-transmit-card-connection-decorator">Exclusive Transmit Card Connection Decorator</a></li>
+<li><a class="reference internal" href="#secure-channel-card-connection-decorator">Secure Channel Card Connection Decorator</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#a-word-on-cryptography">A word on cryptography</a><ul>
+<li><a class="reference internal" href="#bynary-strings-and-list-of-bytes">Bynary strings and list of bytes</a></li>
+<li><a class="reference internal" href="#secret-key-cryptography">Secret key cryptography</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="index.html"
+                        title="previous chapter">pyscard - python for smart cards</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="pyscard-framework.html"
+                        title="next chapter">pyscard smartcard framework samples</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/user-guide.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="pyscard-framework.html" title="pyscard smartcard framework samples"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="index.html" title="pyscard - python for smart cards"
+             >previous</a> |</li>
+        <li><a href="index.html">pyscard 1.6.16 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Jean-Daniel Aussel, Ludovic Rousseau.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>

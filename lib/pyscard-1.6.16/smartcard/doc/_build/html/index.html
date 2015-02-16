@@ -1,0 +1,252 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>pyscard - python for smart cards &mdash; pyscard 1.6.16 documentation</title>
+    
+    <link rel="stylesheet" href="_static/default.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    './',
+        VERSION:     '1.6.16',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="top" title="pyscard 1.6.16 documentation" href="#" />
+    <link rel="next" title="pyscard user’s guide" href="user-guide.html" /> 
+  </head>
+  <body>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="user-guide.html" title="pyscard user’s guide"
+             accesskey="N">next</a> |</li>
+        <li><a href="#">pyscard 1.6.16 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body">
+            
+  <div class="section" id="pyscard-python-for-smart-cards">
+<h1>pyscard - python for smart cards<a class="headerlink" href="#pyscard-python-for-smart-cards" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference external" href="https://sourceforge.net/projects/pyscard/">pyscard - python smart card library -</a> is a python module adding
+smart cards support to <a class="reference external" href="http://www.python.org/">python</a>.</p>
+<p><a class="reference external" href="https://sourceforge.net/projects/pyscard/files/pyscard/">download</a>
+pyscard from sourceforge.net.</p>
+<p>Report bugs, patches and feature requests using the <a class="reference external" href="https://sourceforge.net/p/pyscard/_list/tickets">sourceforge pyscard
+bug tracking system</a>.</p>
+<p>Pyscard consists of:</p>
+<ul class="simple">
+<li><a class="reference external" href="http://pyscard.sourceforge.net/epydoc/smartcard.scard.scard-module.html">smartcard.scard</a>,
+an extension module wrapping the WinSCard API (smart card base
+components) also known as PC/SC, and</li>
+<li><a class="reference external" href="http://pyscard.sourceforge.net/epydoc/index.html">smartcard</a>, a
+higher level python framework built on top of the raw PC/SC API.</li>
+</ul>
+<img alt="_images/pyscard.jpg" class="align-center" src="_images/pyscard.jpg" />
+<div class="section" id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><p><a class="reference internal" href="user-guide.html#pyscard-user-guide"><em>pyscard user&#8217;s guide</em></a></p>
+<p><a class="reference external" href="http://pyscard.sourceforge.net/epydoc/index.html">smartcard reference (python smart card library)</a></p>
+<p><a class="reference external" href="http://pyscard.sourceforge.net/epydoc/smartcard.scard.scard-module.html">scard reference (python PCSC wrapper)</a>,
+the python wrapper around PCSC</p>
+</div></blockquote>
+</div>
+<div class="section" id="samples">
+<h2>Samples<a class="headerlink" href="#samples" title="Permalink to this headline">¶</a></h2>
+<blockquote>
+<div><p>High level API samples: See <a class="reference internal" href="pyscard-framework.html#framework-samples"><em>pyscard smartcard framework samples</em></a></p>
+<p>Low level API samples: See <a class="reference internal" href="pyscard-wrapper.html#wrapper-samples"><em>PCSC wrapper samples</em></a></p>
+</div></blockquote>
+</div>
+<div class="section" id="index">
+<h2>Index<a class="headerlink" href="#index" title="Permalink to this headline">¶</a></h2>
+<p>Contents:</p>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="user-guide.html">pyscard user&#8217;s guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="user-guide.html#copyright">Copyright</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-guide.html#introduction">Introduction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-guide.html#smart-cards">Smart Cards</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user-guide.html#quick-start">Quick-start</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="user-guide.html#the-reader-centric-approach">The reader-centric approach</a></li>
+<li class="toctree-l3"><a class="reference internal" href="user-guide.html#the-answer-to-reset-atr">The Answer To Reset (ATR)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="user-guide.html#the-card-centric-approach">The card-centric approach</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="user-guide.html#requesting-a-card-by-atr">Requesting a card by ATR</a></li>
+<li class="toctree-l4"><a class="reference internal" href="user-guide.html#requesting-any-card">Requesting any card</a></li>
+<li class="toctree-l4"><a class="reference internal" href="user-guide.html#custom-cardtypes">Custom CardTypes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="user-guide.html#selecting-the-card-communication-protocol">Selecting the card communication protocol</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="user-guide.html#the-object-centric-approach">The object-centric approach</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="user-guide.html#tracing-apdus">Tracing APDUs</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="user-guide.html#the-brute-force">The brute force</a></li>
+<li class="toctree-l3"><a class="reference internal" href="user-guide.html#using-card-connection-observers-to-trace-apdu-transmission">Using card connection observers to trace apdu transmission</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="user-guide.html#testing-for-apdu-transmission-errors">Testing for APDU transmission errors</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="user-guide.html#the-brute-force-for-testing-apdu-transmission-errors">The brute force for testing APDU transmission errors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="user-guide.html#checking-apdu-transmission-errors-with-error-checkers">Checking APDU transmission errors with error checkers</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="user-guide.html#error-checkers">Error checkers</a></li>
+<li class="toctree-l4"><a class="reference internal" href="user-guide.html#error-checking-chains">Error checking chains</a></li>
+<li class="toctree-l4"><a class="reference internal" href="user-guide.html#filtering-exceptions">Filtering exceptions</a></li>
+<li class="toctree-l4"><a class="reference internal" href="user-guide.html#detecting-response-apdu-errors-for-a-card-connection">Detecting response APDU errors for a card connection</a></li>
+<li class="toctree-l4"><a class="reference internal" href="user-guide.html#writing-a-custom-error-checker">Writing a custom error checker</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="user-guide.html#smartcard-readers">Smartcard readers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="user-guide.html#listing-smartcard-readers">Listing Smartcard Readers</a></li>
+<li class="toctree-l3"><a class="reference internal" href="user-guide.html#organizing-smartcard-readers-into-reader-groups">Organizing Smartcard Readers into reader groups</a></li>
+<li class="toctree-l3"><a class="reference internal" href="user-guide.html#monitoring-readers">Monitoring readers</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="user-guide.html#id5">Smart Cards</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="user-guide.html#monitoring-smart-cards">Monitoring Smart Cards</a></li>
+<li class="toctree-l3"><a class="reference internal" href="user-guide.html#sending-apdus-to-a-smart-card-obtained-from-card-monitoring">Sending APDUs to a Smart Card Obtained from Card Monitoring</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="user-guide.html#connections">Connections</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="user-guide.html#creating-a-connection-from-a-cardrequest">Creating a Connection from a CardRequest</a></li>
+<li class="toctree-l3"><a class="reference internal" href="user-guide.html#creating-connection-from-cardmonitoring">Creating Connection from CardMonitoring</a></li>
+<li class="toctree-l3"><a class="reference internal" href="user-guide.html#card-connection-decorators">Card Connection Decorators</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="user-guide.html#exclusive-card-connection-decorator">Exclusive Card Connection Decorator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="user-guide.html#exclusive-transmit-card-connection-decorator">Exclusive Transmit Card Connection Decorator</a></li>
+<li class="toctree-l4"><a class="reference internal" href="user-guide.html#secure-channel-card-connection-decorator">Secure Channel Card Connection Decorator</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="user-guide.html#a-word-on-cryptography">A word on cryptography</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="user-guide.html#bynary-strings-and-list-of-bytes">Bynary strings and list of bytes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="user-guide.html#secret-key-cryptography">Secret key cryptography</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="pyscard-framework.html">pyscard smartcard framework samples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pyscard-framework.html#display-the-atr-of-inserted-cards">Display the ATR of inserted cards</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyscard-framework.html#selecting-the-df-telecom-of-a-card">Selecting the DF_TELECOM of a card</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyscard-framework.html#a-simple-apdu-tracer-and-interpreter">A simple apdu tracer and interpreter</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyscard-framework.html#tracing-connection-events">Tracing connection events</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyscard-framework.html#decorating-card-connections-to-add-custom-behavior">Decorating Card Connections to add custom behavior</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyscard-framework.html#detecting-response-apdu-errors">Detecting response apdu errors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyscard-framework.html#implementing-a-custom-errorchecker">Implementing a custom ErrorChecker</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyscard-framework.html#implementing-a-custom-card-type">Implementing a custom card type</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyscard-framework.html#monitoring-smartcard-readers">Monitoring smartcard readers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyscard-framework.html#monitoring-smartcard-insertion-removal">Monitoring smartcard insertion/removal</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyscard-framework.html#apdu-atr-byte-to-string-utilities">APDU/ATR byte to string utilities</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="pyscard-wrapper.html">PCSC wrapper samples</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="pyscard-wrapper.html#send-a-control-code-to-a-card-or-reader">send a Control Code to a card or reader</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyscard-wrapper.html#get-the-atr-of-a-card">get the ATR of a card</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyscard-wrapper.html#get-the-attributes-of-a-card">get the attributes of a card</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyscard-wrapper.html#wait-for-card-insertion-removal">wait for card insertion/removal</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyscard-wrapper.html#list-the-cards-introduced-in-the-system">list the cards introduced in the system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyscard-wrapper.html#list-the-interfaces-supported-by-a-card">list the interfaces supported by a card</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyscard-wrapper.html#locate-cards-in-the-system">locate cards in the system</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyscard-wrapper.html#manage-readers-and-reader-groups">manage readers and reader groups</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyscard-wrapper.html#list-smart-card-readers">list smart card readers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyscard-wrapper.html#select-the-df-telecom-of-a-sim-card">select the DF_TELECOM of a SIM card</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pyscard-wrapper.html#perform-a-simple-smart-card-transaction">perform a simple smart card transaction</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="license.html">License</a></li>
+</ul>
+</div>
+<div class="section" id="indices-and-tables">
+<h3>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><a class="reference internal" href="genindex.html"><em>Index</em></a></li>
+<li><a class="reference internal" href="py-modindex.html"><em>Module Index</em></a></li>
+<li><a class="reference internal" href="search.html"><em>Search Page</em></a></li>
+</ul>
+</div>
+</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar">
+        <div class="sphinxsidebarwrapper">
+  <h3><a href="#">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">pyscard - python for smart cards</a><ul>
+<li><a class="reference internal" href="#documentation">Documentation</a></li>
+<li><a class="reference internal" href="#samples">Samples</a></li>
+<li><a class="reference internal" href="#index">Index</a><ul>
+<li><a class="reference internal" href="#indices-and-tables">Indices and tables</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+  <h4>Next topic</h4>
+  <p class="topless"><a href="user-guide.html"
+                        title="next chapter">pyscard user&#8217;s guide</a></p>
+  <h3>This Page</h3>
+  <ul class="this-page-menu">
+    <li><a href="_sources/index.txt"
+           rel="nofollow">Show Source</a></li>
+  </ul>
+<div id="searchbox" style="display: none">
+  <h3>Quick search</h3>
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="user-guide.html" title="pyscard user’s guide"
+             >next</a> |</li>
+        <li><a href="#">pyscard 1.6.16 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer">
+        &copy; Copyright 2014, Jean-Daniel Aussel, Ludovic Rousseau.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.2.3.
+    </div>
+  </body>
+</html>
